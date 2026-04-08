@@ -9,6 +9,7 @@ const Project = {
   currentSlide: 0,
   projectData: null,
   touchStartX: 0,
+  touchStartY: 0,
   scrollLocked: false,
   wheelAccum: 0,
   wheelTimer: null,
@@ -36,7 +37,7 @@ const Project = {
     }
 
     // Load images and go to start
-    Utils.lazyWindow(this.slides, this.currentSlide, 3);
+    Utils.lazyWindow(this.slides, this.currentSlide, LAZY_RADIUS);
     this._goTo(this.currentSlide, false);
 
     // Update footer
@@ -47,6 +48,7 @@ const Project = {
     for (let i = 1; i <= project.imgCountArchive; i++) {
       this._addImageSlide(project.slug, i);
     }
+    this._addFichaTecnicaSlide(project);
   },
 
   _buildFromContenido(project) {
@@ -59,6 +61,7 @@ const Project = {
         this._addAudioSlide(`/_PROJECTS/${project.slug}/${item.src}`);
       }
     });
+    this._addFichaTecnicaSlide(project);
   },
 
   _addImageSlide(slug, num) {
@@ -98,6 +101,48 @@ const Project = {
     this.slides.push(slide);
   },
 
+  _addFichaTecnicaSlide(project) {
+    const slide = document.createElement('div');
+    slide.className = 'slide slide--ficha';
+
+    const container = document.createElement('div');
+    container.className = 'ficha-content';
+
+    if (project.descripcion) {
+      const p = document.createElement('p');
+      p.className = 'ficha-desc';
+      p.textContent = project.descripcion;
+      container.appendChild(p);
+    }
+    if (project.lugar) {
+      const p = document.createElement('p');
+      p.innerHTML = `<span class="ficha-label">Location</span> ${project.lugar}`;
+      container.appendChild(p);
+    }
+    if (project.fecha) {
+      const p = document.createElement('p');
+      p.innerHTML = `<span class="ficha-label">Date</span> ${project.fecha}`;
+      container.appendChild(p);
+    }
+    if (project.fichaTecnica && project.fichaTecnica.length) {
+      const p = document.createElement('p');
+      p.innerHTML = `<span class="ficha-label">Type</span> ${project.fichaTecnica.join(', ')}`;
+      container.appendChild(p);
+    }
+    if (project.team && project.team.length) {
+      const teamHtml = project.team.map(([name, url]) =>
+        url ? `<a href="${url}" target="_blank">${name}</a>` : name
+      ).join(', ');
+      const p = document.createElement('p');
+      p.innerHTML = `<span class="ficha-label">Team</span> ${teamHtml}`;
+      container.appendChild(p);
+    }
+
+    slide.appendChild(container);
+    this.strip.appendChild(slide);
+    this.slides.push(slide);
+  },
+
   next() {
     if (this.currentSlide < this.slides.length - 1) {
       this._goTo(this.currentSlide + 1);
@@ -115,15 +160,15 @@ const Project = {
     if (animate === undefined) animate = true;
     this.currentSlide = index;
     const offset = -index * 100;
-    this.strip.style.transition = animate ? 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
+    this.strip.style.transition = animate ? SLIDE_TRANSITION : 'none';
     this.strip.style.transform = `translateX(${offset}%)`;
 
     if (animate) {
       this.scrollLocked = true;
-      setTimeout(() => { this.scrollLocked = false; }, 450);
+      setTimeout(() => { this.scrollLocked = false; }, SCROLL_LOCK_MS);
     }
 
-    Utils.lazyWindow(this.slides, index, 3);
+    Utils.lazyWindow(this.slides, index, LAZY_RADIUS);
   },
 
   close() {
@@ -137,41 +182,14 @@ const Project = {
   bindScroll() {
     const viewer = document.getElementById('viewer');
 
-    viewer.addEventListener('wheel', (e) => {
-      if (App.state.view !== 'project') return;
-      e.preventDefault();
-      if (this.scrollLocked) return;
+    // Shared wheel + touch handling
+    Utils.bindHorizontalScroll(viewer, this, {
+      next: () => this.next(),
+      prev: () => this.prev(),
+      isActive: () => App.state.view === 'project'
+    });
 
-      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      this.wheelAccum += delta;
-
-      clearTimeout(this.wheelTimer);
-      this.wheelTimer = setTimeout(() => { this.wheelAccum = 0; }, 200);
-
-      const threshold = 50;
-      if (this.wheelAccum > threshold) {
-        this.wheelAccum = 0;
-        this.next();
-      } else if (this.wheelAccum < -threshold) {
-        this.wheelAccum = 0;
-        this.prev();
-      }
-    }, { passive: false });
-
-    viewer.addEventListener('touchstart', (e) => {
-      if (App.state.view !== 'project') return;
-      this.touchStartX = e.touches[0].clientX;
-    }, { passive: true });
-
-    viewer.addEventListener('touchend', (e) => {
-      if (App.state.view !== 'project') return;
-      const dx = e.changedTouches[0].clientX - this.touchStartX;
-      if (Math.abs(dx) > 40) {
-        if (dx < 0) this.next();
-        else this.prev();
-      }
-    }, { passive: true });
-
+    // Keyboard (project adds Escape)
     document.addEventListener('keydown', (e) => {
       if (App.state.view !== 'project') return;
       if (e.key === 'ArrowRight') this.next();

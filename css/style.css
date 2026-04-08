@@ -98,6 +98,53 @@ html, body {
   justify-content: center;
 }
 
+/* Ficha tecnica slide (end of project) */
+.slide--ficha {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.ficha-content {
+  text-align: center;
+  max-width: 500px;
+}
+
+.ficha-content p {
+  margin-bottom: 0.8rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.ficha-content p:last-child {
+  margin-bottom: 0;
+}
+
+.ficha-desc {
+  margin-bottom: 1.5rem !important;
+  font-size: 1rem !important;
+  line-height: 1.6;
+}
+
+.ficha-label {
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.65rem;
+  margin-right: 0.5rem;
+}
+
+.ficha-content a {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ficha-content a:hover {
+  opacity: 0.6;
+}
+
 /* --- Mirilla (peephole overlays) --- */
 
 .mirilla {
@@ -188,30 +235,39 @@ html, body {
 }
 
 .footer__center {
-  flex: 1;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   text-align: center;
   overflow: hidden;
   white-space: nowrap;
+  max-width: calc(100% - 300px);
 }
 
-/* Project footer — marquee full-width, arrows float on top */
+/* Project footer — marquee full-width, arrows underneath via blend mode */
 #footer-project {
   position: relative;
+  align-items: center;
 }
 
 .footer__arrow {
   position: absolute;
   top: 0;
   height: 100%;
-  padding: 0 1.5rem;
+  padding: 0 1rem;
   cursor: pointer;
-  z-index: 3;
-  background: #000;
   display: flex;
   align-items: center;
   transition: opacity 0.2s;
-  font-size: 1rem;
-  letter-spacing: 0;
+  z-index: 1;
+  background: transparent;
+}
+
+.footer__arrow svg {
+  width: 12px;
+  height: 18px;
+  fill: #fff;
+  stroke: none;
 }
 
 .footer__arrow:hover {
@@ -221,23 +277,27 @@ html, body {
 #btn-back { left: 0; }
 #btn-next { right: 0; }
 
-/* Marquee container — full width, passes under arrows */
+/* Marquee container — full width, passes over arrows */
 .footer__marquee {
   width: 100%;
   overflow: hidden;
   position: relative;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .footer__marquee-inner {
   display: inline-flex;
   white-space: nowrap;
-  animation: marquee 30s linear infinite;
+  animation: marquee 60s linear infinite;
   mix-blend-mode: difference;
   color: #fff;
+  -webkit-text-stroke: 0.5px #fff;
+  font-size: 1rem;
 }
 
 .footer__marquee-inner span {
-  padding: 0 4rem;
+  padding: 0 2.5rem;
 }
 
 @keyframes marquee {
@@ -246,7 +306,7 @@ html, body {
 }
 
 /* Footer modes */
-#footer-home { display: flex; width: 100%; position: relative; }
+#footer-home { display: flex; width: 100%; position: relative; justify-content: space-between; }
 #footer-project { display: none; width: 100%; overflow: hidden; }
 
 .view-project #footer-home { display: none; }
@@ -258,7 +318,19 @@ html, body {
 .footer__center { cursor: pointer; }
 .footer__center:hover { opacity: 0.6; }
 
-/* --- Lengüeta (project info tab) --- */
+/* Mode switch icon */
+.switch-icon {
+  width: 22px;
+  height: 22px;
+  stroke: #fff;
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: middle;
+}
+
+/* --- Lengüeta (project browser menu) --- */
 
 .lengueta {
   position: absolute;
@@ -268,14 +340,16 @@ html, body {
   background: #000;
   border: 1px solid #fff;
   border-bottom: none;
-  padding: 1.2rem 1.5rem;
-  min-width: 280px;
-  max-width: 400px;
+  padding: 1rem 1.5rem;
+  min-width: 200px;
   z-index: 5;
-  font-size: 0.75rem;
-  line-height: 1.6;
-  text-transform: none;
-  letter-spacing: 0.02em;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  pointer-events: none;
 }
 
 /* Cover the footer border where lengüeta meets it */
@@ -289,29 +363,35 @@ html, body {
   background: #000;
 }
 
-.lengueta__content p {
-  margin-bottom: 0.6rem;
+.lengueta--open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
-.lengueta__content p:last-child {
-  margin-bottom: 0;
+.lengueta__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
 }
 
-.lengueta__content .lengueta__label {
+.lengueta__item {
+  padding: 0.3rem 0;
+  cursor: pointer;
   opacity: 0.5;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.65rem;
+  transition: opacity 0.2s;
+  white-space: nowrap;
 }
 
-.lengueta__content a {
-  color: #fff;
+.lengueta__item:hover {
+  opacity: 1;
+}
+
+.lengueta__item--active {
+  opacity: 1;
   text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.lengueta__content a:hover {
-  opacity: 0.6;
+  text-underline-offset: 3px;
 }
 
 /* --- 8x8 Grid Transition --- */
@@ -415,8 +495,6 @@ html, body {
 }
 
 /* --- Utility --- */
-
-.hidden { display: none !important; }
 
 /* Cursor */
 body { cursor: crosshair; }

@@ -2,6 +2,14 @@
    Utils — helpers, lazy loading, image sizing
    ============================================ */
 
+// --- Shared constants ---
+const SCROLL_LOCK_MS = 700;
+const WHEEL_THRESHOLD = 120;
+const WHEEL_RESET_MS = 120;
+const TOUCH_MIN_SWIPE = 40;
+const LAZY_RADIUS = 3;
+const SLIDE_TRANSITION = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+
 const Utils = {
 
   // Build image path for a project
@@ -88,5 +96,53 @@ const Utils = {
     const m = Math.floor(s / 60);
     const sec = Math.floor(s % 60);
     return m + ':' + String(sec).padStart(2, '0');
+  },
+
+  // Bind horizontal scroll (wheel + touch) to an element
+  // ctx must have: scrollLocked, wheelAccum, wheelTimer, touchStartX, touchStartY
+  // callbacks: { next, prev, isActive }
+  bindHorizontalScroll(element, ctx, callbacks) {
+    element.addEventListener('wheel', (e) => {
+      if (!callbacks.isActive()) return;
+      e.preventDefault();
+      if (ctx.scrollLocked) return;
+
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      const isTrackpad = Math.abs(e.deltaY) < 50 && e.deltaMode === 0 && !Number.isInteger(e.deltaY);
+
+      if (!isTrackpad) {
+        if (delta > 0) callbacks.next();
+        else if (delta < 0) callbacks.prev();
+        return;
+      }
+
+      ctx.wheelAccum += delta;
+      clearTimeout(ctx.wheelTimer);
+      ctx.wheelTimer = setTimeout(() => { ctx.wheelAccum = 0; }, WHEEL_RESET_MS);
+
+      if (ctx.wheelAccum > WHEEL_THRESHOLD) {
+        ctx.wheelAccum = 0;
+        callbacks.next();
+      } else if (ctx.wheelAccum < -WHEEL_THRESHOLD) {
+        ctx.wheelAccum = 0;
+        callbacks.prev();
+      }
+    }, { passive: false });
+
+    element.addEventListener('touchstart', (e) => {
+      if (!callbacks.isActive()) return;
+      ctx.touchStartX = e.touches[0].clientX;
+      ctx.touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    element.addEventListener('touchend', (e) => {
+      if (!callbacks.isActive()) return;
+      const dx = e.changedTouches[0].clientX - ctx.touchStartX;
+      const dy = e.changedTouches[0].clientY - ctx.touchStartY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > TOUCH_MIN_SWIPE) {
+        if (dx < 0) callbacks.next();
+        else callbacks.prev();
+      }
+    }, { passive: true });
   }
 };

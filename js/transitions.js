@@ -65,7 +65,7 @@ const Transitions = {
   // --- 8x8 Grid Transition ---
 
   // Run the full blackout → reveal transition
-  async gridTransition(newFirstImageSrc) {
+  async gridTransition(newFirstImageSrc, onBlackout) {
     const grid = this.gridEl;
     const cells = this.cells;
 
@@ -83,6 +83,9 @@ const Transitions = {
     // Small pause at full black
     await new Promise(r => setTimeout(r, 200));
 
+    // Execute callback while screen is fully black (update strip content)
+    if (onBlackout) onBlackout();
+
     // Preload the target image
     const targetImg = new Image();
     targetImg.src = newFirstImageSrc;
@@ -94,8 +97,27 @@ const Transitions = {
     });
 
     // Set each cell's background to show its portion of the image
+    // Use cover-like sizing to match how images display in the viewer
     const vw = window.innerWidth;
-    const vh = window.innerHeight;
+    const vh = window.innerHeight - 48; // subtract footer height
+    const imgW = targetImg.naturalWidth;
+    const imgH = targetImg.naturalHeight;
+
+    // Calculate cover dimensions (same as Utils.sizeImage logic)
+    let renderW, renderH;
+    if (imgW / imgH > vw / vh) {
+      // Image wider than viewport — fill height
+      renderH = vh;
+      renderW = (imgW / imgH) * vh;
+    } else {
+      // Image taller than viewport — fill width
+      renderW = vw;
+      renderH = (imgH / imgW) * vw;
+    }
+
+    // Center offset
+    const offsetX = (vw - renderW) / 2;
+    const offsetY = (vh - renderH) / 2;
     const cellW = vw / 8;
     const cellH = vh / 8;
 
@@ -103,8 +125,8 @@ const Transitions = {
       const col = i % 8;
       const row = Math.floor(i / 8);
       cell.style.backgroundImage = `url(${newFirstImageSrc})`;
-      cell.style.backgroundSize = `${vw}px ${vh}px`;
-      cell.style.backgroundPosition = `-${col * cellW}px -${row * cellH}px`;
+      cell.style.backgroundSize = `${renderW}px ${renderH}px`;
+      cell.style.backgroundPosition = `${offsetX - col * cellW}px ${offsetY - row * cellH}px`;
     });
 
     // Phase 2: Reveal — cells become transparent randomly

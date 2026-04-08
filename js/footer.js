@@ -45,41 +45,71 @@ const Footer = {
   },
 
   openLengueta() {
-    const p = this._currentProject;
-    if (!p) return;
+    const projects = App.state.projects;
+    if (!projects || !projects.length) return;
 
+    // Build project list
     let html = '';
-    if (p.descripcion) html += `<p>${p.descripcion}</p>`;
-    if (p.lugar) html += `<p><span class="lengueta__label">Location</span> ${p.lugar}</p>`;
-    if (p.fecha) html += `<p><span class="lengueta__label">Date</span> ${p.fecha}</p>`;
-    if (p.fichaTecnica && p.fichaTecnica.length) {
-      html += `<p><span class="lengueta__label">Type</span> ${p.fichaTecnica.join(', ')}</p>`;
-    }
-    if (p.team && p.team.length) {
-      const teamHtml = p.team.map(([name, url]) =>
-        url ? `<a href="${url}" target="_blank">${name}</a>` : name
-      ).join(', ');
-      html += `<p><span class="lengueta__label">Team</span> ${teamHtml}</p>`;
-    }
-
-    if (!html) html = '<p>No info yet</p>';
+    projects.forEach((p, idx) => {
+      const isActive = App.state.currentProjectIndex === idx ||
+        (App.state.view === 'home' && this._currentProject && this._currentProject.slug === p.slug);
+      const activeClass = isActive ? ' lengueta__item--active' : '';
+      html += `<div class="lengueta__item${activeClass}" data-project-index="${idx}">${p.nombre}</div>`;
+    });
 
     this.els.lenguetaContent.innerHTML = html;
-    this.els.lengueta.classList.remove('hidden');
+    this.els.lengueta.classList.add('lengueta--open');
     this.lenguetaOpen = true;
+
+    // Bind click handlers
+    this.els.lenguetaContent.querySelectorAll('.lengueta__item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        const idx = parseInt(e.target.dataset.projectIndex);
+        this.closeLengueta();
+        // Always use grid transition from lengüeta (direct navigation)
+        App.goToProject(idx);
+      });
+    });
+
+    // Close on click outside (deferred to avoid immediate trigger)
+    setTimeout(() => {
+      this._closeLenguetaHandler = (e) => {
+        if (!this.els.lengueta.contains(e.target) && !this.els.projectName.contains(e.target)) {
+          this.closeLengueta();
+        }
+      };
+      document.addEventListener('click', this._closeLenguetaHandler);
+    }, 10);
+
+    // Close on Escape
+    this._closeLenguetaEsc = (e) => {
+      if (e.key === 'Escape') this.closeLengueta();
+    };
+    document.addEventListener('keydown', this._closeLenguetaEsc);
   },
 
   closeLengueta() {
-    this.els.lengueta.classList.add('hidden');
+    this.els.lengueta.classList.remove('lengueta--open');
     this.lenguetaOpen = false;
+    if (this._closeLenguetaHandler) {
+      document.removeEventListener('click', this._closeLenguetaHandler);
+      this._closeLenguetaHandler = null;
+    }
+    if (this._closeLenguetaEsc) {
+      document.removeEventListener('keydown', this._closeLenguetaEsc);
+      this._closeLenguetaEsc = null;
+    }
   },
 
   // Switch to project footer mode with marquee
   showProject(name) {
     document.body.classList.add('view-project');
-    // Fill marquee with repeated text (need 2x for seamless loop)
-    const repeated = (name + ' \u00B7 ').repeat(20);
-    this.els.marquee.innerHTML = `<span>${repeated}</span><span>${repeated}</span>`;
+    // Fill marquee with individual spans (2x for seamless loop)
+    let spans = '';
+    for (let i = 0; i < 40; i++) {
+      spans += `<span>${name}</span>`;
+    }
+    this.els.marquee.innerHTML = spans;
   },
 
   // Switch back to home footer mode
@@ -87,15 +117,15 @@ const Footer = {
     document.body.classList.remove('view-project');
   },
 
-  // Update switch icon based on mode
-  // ☉ (U+2609, sun with dot) = go to personal
-  // ○ (U+25CB, circle) = go to commercial
+  // Update switch icon based on mode — circle with/without dot
   updateSwitchIcon(currentMode) {
     if (currentMode === 'commercial') {
-      this.els.switchBtn.textContent = '\u2609'; // sun = click to go personal
+      // Circle with dot = click to go personal
+      this.els.switchBtn.innerHTML = '<svg class="switch-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="#fff" stroke="none"/></svg>';
       this.els.switchBtn.title = 'personal';
     } else {
-      this.els.switchBtn.textContent = '\u25CB'; // circle = click to go commercial
+      // Empty circle = click to go commercial
+      this.els.switchBtn.innerHTML = '<svg class="switch-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>';
       this.els.switchBtn.title = 'commercial';
     }
   },

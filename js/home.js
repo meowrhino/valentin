@@ -1,52 +1,50 @@
 /* ============================================
    Home — horizontal strip with mirilla
+   Infinite loop via clone technique
    ============================================ */
 
 const Home = {
 
   strip: null,
-  slides: [],
-  slideMap: [],      // maps slide index → { projectIndex, photoNum }
+  slides: [],        // all slides including clones
+  realSlides: [],    // only real slides
+  slideMap: [],      // maps slide index → { projectIndex, photoNum } (includes clones)
+  realSlideMap: [],  // only real entries
   currentSlide: 0,
+  realCount: 0,
   touchStartX: 0,
   touchStartY: 0,
   scrollLocked: false,
   wheelAccum: 0,
   wheelTimer: null,
+  _jumping: false,   // true during instant clone→real jump
 
   init(projects) {
     this.strip = document.getElementById('strip');
     this.strip.innerHTML = '';
-    this.slides = [];
-    this.slideMap = [];
+    this.realSlides = [];
+    this.realSlideMap = [];
     this.currentSlide = 0;
 
-    // Build slides from fotosHome of each project
+    // Build real slides from fotosHome of each project
     projects.forEach((project, pIdx) => {
       project.fotosHome.forEach(num => {
-        const slide = document.createElement('div');
-        slide.className = 'slide';
-        slide.dataset.project = project.slug;
-        slide.dataset.projectIndex = pIdx;
-        slide.dataset.photoNum = num;
-
-        const img = document.createElement('img');
-        img.dataset.src = Utils.imgPath(project.slug, num, project.imgExt);
-        img.alt = project.nombre;
-
-        img.addEventListener('load', () => {
-          Utils.sizeImage(img, slide);
-        });
-
-        slide.appendChild(img);
-        this.strip.appendChild(slide);
-        this.slides.push(slide);
-        this.slideMap.push({ projectIndex: pIdx, photoNum: num });
+        const slide = this._createSlide(project, pIdx, num);
+        this.realSlides.push(slide);
+        this.realSlideMap.push({ projectIndex: pIdx, photoNum: num });
       });
     });
 
+    this.realCount = this.realSlides.length;
+
+    // Build strip with clones for infinite loop
+    this._buildStripWithClones();
+
+    // Start at first real slide (index 1, after the prepended clone)
+    this.currentSlide = 1;
+
     // Load initial window of images
-    Utils.lazyWindow(this.slides, 0, 3);
+    Utils.lazyWindow(this.slides, this.currentSlide, LAZY_RADIUS);
 
     // Update footer with first project
     this._updateFooterProject();
@@ -55,53 +53,82 @@ const Home = {
     this._onResize = Utils.debounce(() => this._resizeAll(), 150);
     window.addEventListener('resize', this._onResize);
 
+    // Listen for transition end to handle clone→real jumps
+    this.strip.addEventListener('transitionend', () => this._onTransitionEnd());
+
     this._bindScroll();
-    this._goTo(0, false);
+    this._goTo(this.currentSlide, false);
+  },
+
+  _createSlide(project, pIdx, num) {
+    const slide = document.createElement('div');
+    slide.className = 'slide';
+    slide.dataset.project = project.slug;
+    slide.dataset.projectIndex = pIdx;
+    slide.dataset.photoNum = num;
+
+    const img = document.createElement('img');
+    img.dataset.src = Utils.imgPath(project.slug, num, project.imgExt);
+    img.alt = project.nombre;
+
+    img.addEventListener('load', () => {
+      Utils.sizeImage(img, slide);
+    });
+
+    slide.appendChild(img);
+    return slide;
+  },
+
+  _cloneSlide(slide, mapEntry) {
+    const clone = slide.cloneNode(true);
+    clone.classList.add('slide--clone');
+    // Re-attach load listener for the cloned img
+    const img = clone.querySelector('img');
+    if (img) {
+      img.addEventListener('load', () => {
+        Utils.sizeImage(img, clone);
+      });
+    }
+    return clone;
+  },
+
+  _buildStripWithClones() {
+    this.slides = [];
+    this.slideMap = [];
+    this.strip.innerHTML = '';
+
+    if (this.realCount === 0) return;
+
+    // Clone of last real slide → prepend
+    const lastIdx = this.realCount - 1;
+    const cloneLast = this._cloneSlide(this.realSlides[lastIdx]);
+    this.slides.push(cloneLast);
+    this.slideMap.push({ ...this.realSlideMap[lastIdx] });
+    this.strip.appendChild(cloneLast);
+
+    // Real slides
+    this.realSlides.forEach((slide, i) => {
+      this.slides.push(slide);
+      this.slideMap.push({ ...this.realSlideMap[i] });
+      this.strip.appendChild(slide);
+    });
+
+    // Clone of first real slide → append
+    const cloneFirst = this._cloneSlide(this.realSlides[0]);
+    this.slides.push(cloneFirst);
+    this.slideMap.push({ ...this.realSlideMap[0] });
+    this.strip.appendChild(cloneFirst);
   },
 
   _bindScroll() {
     const viewer = document.getElementById('viewer');
 
-    // Mouse wheel → horizontal scroll
-    // Accumulates delta for trackpads (many small events) and discrete mice
-    viewer.addEventListener('wheel', (e) => {
-      if (App.state.view !== 'home') return;
-      e.preventDefault();
-      if (this.scrollLocked) return;
-
-      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      this.wheelAccum += delta;
-
-      clearTimeout(this.wheelTimer);
-      this.wheelTimer = setTimeout(() => { this.wheelAccum = 0; }, 200);
-
-      const threshold = 50;
-      if (this.wheelAccum > threshold) {
-        this.wheelAccum = 0;
-        this.next();
-      } else if (this.wheelAccum < -threshold) {
-        this.wheelAccum = 0;
-        this.prev();
-      }
-    }, { passive: false });
-
-    // Touch support
-    viewer.addEventListener('touchstart', (e) => {
-      if (App.state.view !== 'home') return;
-      this.touchStartX = e.touches[0].clientX;
-      this.touchStartY = e.touches[0].clientY;
-    }, { passive: true });
-
-    viewer.addEventListener('touchend', (e) => {
-      if (App.state.view !== 'home') return;
-      const dx = e.changedTouches[0].clientX - this.touchStartX;
-      const dy = e.changedTouches[0].clientY - this.touchStartY;
-      // Only act on horizontal swipes
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
-        if (dx < 0) this.next();
-        else this.prev();
-      }
-    }, { passive: true });
+    // Shared wheel + touch handling
+    Utils.bindHorizontalScroll(viewer, this, {
+      next: () => this.next(),
+      prev: () => this.prev(),
+      isActive: () => App.state.view === 'home'
+    });
 
     // Keyboard
     document.addEventListener('keydown', (e) => {
@@ -122,14 +149,42 @@ const Home = {
   },
 
   next() {
-    if (this.currentSlide < this.slides.length - 1) {
-      this._goTo(this.currentSlide + 1);
-    }
+    // Always advance one position (even into clone territory)
+    this._goTo(this.currentSlide + 1);
   },
 
   prev() {
-    if (this.currentSlide > 0) {
-      this._goTo(this.currentSlide - 1);
+    // Always go back one position (even into clone territory)
+    this._goTo(this.currentSlide - 1);
+  },
+
+  _onTransitionEnd() {
+    if (this._jumping) return;
+
+    // If we animated to the clone of the first slide (index realCount + 1),
+    // jump instantly to the real first slide (index 1)
+    if (this.currentSlide >= this.realCount + 1) {
+      this._jumping = true;
+      this.currentSlide = 1;
+      this.strip.style.transition = 'none';
+      this.strip.style.transform = `translateX(${-this.currentSlide * 100}%)`;
+      // Force reflow then re-enable transitions
+      this.strip.offsetHeight;
+      this._jumping = false;
+      Utils.lazyWindow(this.slides, this.currentSlide, LAZY_RADIUS);
+      this._updateFooterProject();
+    }
+    // If we animated to the clone of the last slide (index 0),
+    // jump instantly to the real last slide (index realCount)
+    else if (this.currentSlide <= 0) {
+      this._jumping = true;
+      this.currentSlide = this.realCount;
+      this.strip.style.transition = 'none';
+      this.strip.style.transform = `translateX(${-this.currentSlide * 100}%)`;
+      this.strip.offsetHeight;
+      this._jumping = false;
+      Utils.lazyWindow(this.slides, this.currentSlide, LAZY_RADIUS);
+      this._updateFooterProject();
     }
   },
 
@@ -137,17 +192,17 @@ const Home = {
     if (animate === undefined) animate = true;
     this.currentSlide = index;
     const offset = -index * 100;
-    this.strip.style.transition = animate ? 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
+    this.strip.style.transition = animate ? SLIDE_TRANSITION : 'none';
     this.strip.style.transform = `translateX(${offset}%)`;
 
     // Lock scroll during animation
     if (animate) {
       this.scrollLocked = true;
-      setTimeout(() => { this.scrollLocked = false; }, 450);
+      setTimeout(() => { this.scrollLocked = false; }, SCROLL_LOCK_MS);
     }
 
     // Lazy load window
-    Utils.lazyWindow(this.slides, index, 3);
+    Utils.lazyWindow(this.slides, index, LAZY_RADIUS);
 
     // Update footer
     this._updateFooterProject();
@@ -171,26 +226,27 @@ const Home = {
     });
   },
 
-  // Get current slide index for restoring position
+  // Get current slide index (in real-slide terms, 0-based)
   getPosition() {
-    return this.currentSlide;
+    // Convert from clone-aware index to real index
+    return this.currentSlide - 1;
   },
 
-  // Restore position when coming back from project
+  // Restore position when coming back from project (real index, 0-based)
   setPosition(index) {
-    this._goTo(index, false);
+    // Convert from real index to clone-aware index
+    this._goTo(index + 1, false);
   },
 
   show() {
-    // Re-insert slides into the strip (Project.close() cleared it)
-    this.strip.innerHTML = '';
-    this.slides.forEach(slide => this.strip.appendChild(slide));
+    // Re-build strip with clones
+    this._buildStripWithClones();
     this.strip.style.display = 'flex';
     this._goTo(this.currentSlide, false);
   },
 
   hide() {
-    // Detach slides but keep references
+    // Detach all slides (including clones) but keep real references
     this.slides.forEach(slide => slide.remove());
   }
 };

@@ -15,8 +15,14 @@ const App = {
 
   async init() {
     // Fetch data
-    const res = await fetch('/data.json');
-    this.state.data = await res.json();
+    try {
+      const res = await fetch('/data.json');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      this.state.data = await res.json();
+    } catch (err) {
+      console.error('Failed to load data:', err);
+      return;
+    }
     this.state.projects = this.state.data.projects;
 
     // Init modules
@@ -83,14 +89,13 @@ const App = {
     const firstProject = newProjects[0];
     const firstImgSrc = Utils.imgPath(firstProject.slug, firstProject.fotosHome[0], firstProject.imgExt);
 
-    await Transitions.gridTransition(firstImgSrc);
-
-    this.state.mode = newMode;
-    this.state.projects = newProjects;
-    this.state.homeSlidePos = 0;
-
-    Home.init(this.state.projects);
-    Footer.updateSwitchIcon(newMode);
+    await Transitions.gridTransition(firstImgSrc, () => {
+      this.state.mode = newMode;
+      this.state.projects = newProjects;
+      this.state.homeSlidePos = 0;
+      Home.init(this.state.projects);
+      Footer.updateSwitchIcon(newMode);
+    });
 
     history.pushState(null, '', '/');
     this.state.view = 'home';
@@ -106,10 +111,10 @@ const App = {
     this.state.homeSlidePos = Home.getPosition();
 
     const firstImgSrc = Utils.imgPath(about.slug, 1, about.imgExt);
-    await Transitions.gridTransition(firstImgSrc);
-
-    this.state.currentProjectIndex = -1; // special: about
-    Project.open(about, null);
+    await Transitions.gridTransition(firstImgSrc, () => {
+      this.state.currentProjectIndex = -1; // special: about
+      Project.open(about, null);
+    });
 
     history.pushState(null, '', '/about');
     this.state.view = 'project';
@@ -171,9 +176,10 @@ const App = {
       const firstProject = this.state.projects[0];
       const firstImgSrc = Utils.imgPath(firstProject.slug, 1, firstProject.imgExt);
       AudioPlayer.stopAll();
-      await Transitions.gridTransition(firstImgSrc);
-      this.state.currentProjectIndex = 0;
-      Project.open(firstProject, null);
+      await Transitions.gridTransition(firstImgSrc, () => {
+        this.state.currentProjectIndex = 0;
+        Project.open(firstProject, null);
+      });
       history.pushState(null, '', `/project/${firstProject.slug}`);
       this.state.view = 'project';
       return;
@@ -186,16 +192,39 @@ const App = {
     // Stop current audio
     AudioPlayer.stopAll();
 
-    // Run 8x8 grid transition
-    await Transitions.gridTransition(firstImgSrc);
-
-    // Open next project
-    this.state.currentProjectIndex = nextIdx;
-    Project.open(nextProject, null);
+    // Run 8x8 grid transition — update strip while screen is black
+    await Transitions.gridTransition(firstImgSrc, () => {
+      this.state.currentProjectIndex = nextIdx;
+      Project.open(nextProject, null);
+    });
 
     // Update URL
     history.pushState(null, '', `/project/${nextProject.slug}`);
 
+    this.state.view = 'project';
+  },
+
+  // Go to a specific project by index (from lengüeta menu, works from home or project)
+  async goToProject(projectIndex) {
+    if (this.state.view === 'transitioning') return;
+    const wasHome = this.state.view === 'home';
+    this.state.view = 'transitioning';
+
+    if (wasHome) {
+      this.state.homeSlidePos = Home.getPosition();
+    }
+
+    const project = this.state.projects[projectIndex];
+    const firstImgSrc = Utils.imgPath(project.slug, 1, project.imgExt);
+
+    AudioPlayer.stopAll();
+
+    await Transitions.gridTransition(firstImgSrc, () => {
+      this.state.currentProjectIndex = projectIndex;
+      Project.open(project, null);
+    });
+
+    history.pushState(null, '', `/project/${project.slug}`);
     this.state.view = 'project';
   },
 
