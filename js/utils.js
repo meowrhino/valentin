@@ -111,6 +111,8 @@ const Utils = {
       const isTrackpad = Math.abs(e.deltaY) < 50 && e.deltaMode === 0 && !Number.isInteger(e.deltaY);
 
       if (!isTrackpad) {
+        ctx.scrollLocked = true;
+        setTimeout(() => { ctx.scrollLocked = false; }, SCROLL_LOCK_MS);
         if (delta > 0) callbacks.next();
         else if (delta < 0) callbacks.prev();
         return;

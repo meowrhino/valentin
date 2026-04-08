@@ -25,8 +25,11 @@ const Footer = {
   },
 
   // Update the project name shown in home footer center
-  setHomeName(name) {
-    this.els.projectName.textContent = name;
+  setHomeName(name, fecha) {
+    const isPersonal = App.state.mode === 'personal';
+    this.els.projectName.textContent = isPersonal ? (fecha || name) : name;
+    // Update left side name for personal mode
+    this.els.aboutBtn.textContent = isPersonal ? 'valentín' : 'valentin barrio';
     // Close lengüeta when project changes
     this.closeLengueta();
   },
@@ -37,6 +40,8 @@ const Footer = {
   },
 
   toggleLengueta() {
+    // Lengüeta only available in home view
+    if (App.state.view !== 'home') return;
     if (this.lenguetaOpen) {
       this.closeLengueta();
     } else {
@@ -48,26 +53,47 @@ const Footer = {
     const projects = App.state.projects;
     if (!projects || !projects.length) return;
 
-    // Build project list
+    // Find current project index
+    let currentIdx = -1;
+    if (App.state.currentProjectIndex !== null && App.state.currentProjectIndex >= 0) {
+      currentIdx = App.state.currentProjectIndex;
+    } else if (App.state.view === 'home' && this._currentProject) {
+      currentIdx = projects.findIndex(p => p.slug === this._currentProject.slug);
+    }
+
+    // Build cyclic order: current project first, then the rest in order
+    const order = [];
+    if (currentIdx >= 0) {
+      order.push(currentIdx);
+      for (let i = 1; i < projects.length; i++) {
+        order.push((currentIdx + i) % projects.length);
+      }
+    } else {
+      for (let i = 0; i < projects.length; i++) order.push(i);
+    }
+
+    // Build project list — show fecha (date) instead of nombre in personal mode
+    const isPersonal = App.state.mode === 'personal';
     let html = '';
-    projects.forEach((p, idx) => {
-      const isActive = App.state.currentProjectIndex === idx ||
-        (App.state.view === 'home' && this._currentProject && this._currentProject.slug === p.slug);
+    order.forEach((idx, pos) => {
+      const p = projects[idx];
+      const isActive = idx === currentIdx;
       const activeClass = isActive ? ' lengueta__item--active' : '';
-      html += `<div class="lengueta__item${activeClass}" data-project-index="${idx}">${p.nombre}</div>`;
+      const label = isPersonal ? (p.fecha || p.nombre) : p.nombre;
+      html += `<div class="lengueta__item${activeClass}" data-project-index="${idx}">${label}</div>`;
     });
 
     this.els.lenguetaContent.innerHTML = html;
     this.els.lengueta.classList.add('lengueta--open');
+    this.els.projectName.style.opacity = '0';
     this.lenguetaOpen = true;
 
-    // Bind click handlers
+    // Bind click handlers — scroll to project's first image in home strip
     this.els.lenguetaContent.querySelectorAll('.lengueta__item').forEach(item => {
       item.addEventListener('click', (e) => {
         const idx = parseInt(e.target.dataset.projectIndex);
         this.closeLengueta();
-        // Always use grid transition from lengüeta (direct navigation)
-        App.goToProject(idx);
+        Home.scrollToProject(idx);
       });
     });
 
@@ -90,6 +116,7 @@ const Footer = {
 
   closeLengueta() {
     this.els.lengueta.classList.remove('lengueta--open');
+    this.els.projectName.style.opacity = '';
     this.lenguetaOpen = false;
     if (this._closeLenguetaHandler) {
       document.removeEventListener('click', this._closeLenguetaHandler);
@@ -102,12 +129,14 @@ const Footer = {
   },
 
   // Switch to project footer mode with marquee
-  showProject(name) {
+  showProject(name, fecha) {
     document.body.classList.add('view-project');
+    const isPersonal = App.state.mode === 'personal';
+    const label = isPersonal ? (fecha || name) : name;
     // Fill marquee with individual spans (2x for seamless loop)
     let spans = '';
     for (let i = 0; i < 40; i++) {
-      spans += `<span>${name}</span>`;
+      spans += `<span>${label}</span>`;
     }
     this.els.marquee.innerHTML = spans;
   },
@@ -128,6 +157,37 @@ const Footer = {
       this.els.switchBtn.innerHTML = '<svg class="switch-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>';
       this.els.switchBtn.title = 'commercial';
     }
+    // Update favicon to the opposite icon, in black
+    this._updateFavicon(currentMode);
+  },
+
+  _updateFavicon(currentMode) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 32; canvas.height = 32;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, 32, 32);
+    ctx.strokeStyle = '#000';
+    ctx.fillStyle = '#000';
+    ctx.lineWidth = 1.5;
+    // Draw opposite icon: if commercial, favicon = empty circle (personal icon)
+    ctx.beginPath();
+    ctx.arc(16, 16, 10, 0, Math.PI * 2);
+    ctx.stroke();
+    if (currentMode === 'personal') {
+      // Favicon = circle with dot (commercial icon)
+      ctx.beginPath();
+      ctx.arc(16, 16, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Set as favicon
+    let link = document.querySelector("link[rel*='icon']");
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+    }
+    link.type = 'image/png';
+    link.href = canvas.toDataURL('image/png');
   },
 
   // Bind arrow callbacks

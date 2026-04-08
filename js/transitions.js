@@ -83,12 +83,21 @@ const Transitions = {
     // Small pause at full black
     await new Promise(r => setTimeout(r, 200));
 
+    // Preload the target image (start early, before onBlackout)
+    const targetImg = new Image();
+    targetImg.src = newFirstImageSrc;
+
     // Execute callback while screen is fully black (update strip content)
     if (onBlackout) onBlackout();
 
-    // Preload the target image
-    const targetImg = new Image();
-    targetImg.src = newFirstImageSrc;
+    // Wait for strip images to start loading
+    const stripImgs = document.querySelectorAll('#strip img[data-src]');
+    const firstStripImg = stripImgs[0];
+    if (firstStripImg && firstStripImg.dataset.src && !firstStripImg.src) {
+      firstStripImg.src = firstStripImg.dataset.src;
+    }
+
+    // Wait for target image to load
     await new Promise(r => {
       if (targetImg.complete) return r();
       targetImg.onload = r;
@@ -99,7 +108,7 @@ const Transitions = {
     // Set each cell's background to show its portion of the image
     // Use cover-like sizing to match how images display in the viewer
     const vw = window.innerWidth;
-    const vh = window.innerHeight - 48; // subtract footer height
+    const vh = window.innerHeight - 48; // viewer height (viewport minus footer)
     const imgW = targetImg.naturalWidth;
     const imgH = targetImg.naturalHeight;
 
@@ -128,6 +137,15 @@ const Transitions = {
       cell.style.backgroundSize = `${renderW}px ${renderH}px`;
       cell.style.backgroundPosition = `${offsetX - col * cellW}px ${offsetY - row * cellH}px`;
     });
+
+    // Wait for first strip image to be ready too
+    if (firstStripImg && !firstStripImg.complete) {
+      await new Promise(r => {
+        firstStripImg.addEventListener('load', r, { once: true });
+        firstStripImg.addEventListener('error', r, { once: true });
+        setTimeout(r, 2000);
+      });
+    }
 
     // Phase 2: Reveal — cells become transparent randomly
     const order2 = Utils.shuffle(Utils.range(64));

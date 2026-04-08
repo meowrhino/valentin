@@ -41,7 +41,7 @@ const Project = {
     this._goTo(this.currentSlide, false);
 
     // Update footer
-    Footer.showProject(project.nombre);
+    Footer.showProject(project.nombre, project.fecha);
   },
 
   _buildFromArchive(project) {

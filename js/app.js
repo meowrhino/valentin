@@ -27,6 +27,7 @@ const App = {
 
     // Init modules
     Footer.init();
+    Footer.updateSwitchIcon(this.state.mode);
     Transitions.init();
     Home.init(this.state.projects);
     Project.bindScroll();
@@ -114,6 +115,7 @@ const App = {
     await Transitions.gridTransition(firstImgSrc, () => {
       this.state.currentProjectIndex = -1; // special: about
       Project.open(about, null);
+      this._ensureMirillaOpen();
     });
 
     history.pushState(null, '', '/about');
@@ -204,28 +206,12 @@ const App = {
     this.state.view = 'project';
   },
 
-  // Go to a specific project by index (from lengüeta menu, works from home or project)
-  async goToProject(projectIndex) {
-    if (this.state.view === 'transitioning') return;
-    const wasHome = this.state.view === 'home';
-    this.state.view = 'transitioning';
-
-    if (wasHome) {
-      this.state.homeSlidePos = Home.getPosition();
-    }
-
-    const project = this.state.projects[projectIndex];
-    const firstImgSrc = Utils.imgPath(project.slug, 1, project.imgExt);
-
-    AudioPlayer.stopAll();
-
-    await Transitions.gridTransition(firstImgSrc, () => {
-      this.state.currentProjectIndex = projectIndex;
-      Project.open(project, null);
-    });
-
-    history.pushState(null, '', `/project/${project.slug}`);
-    this.state.view = 'project';
+  // Instantly set mirilla to open state (no animation)
+  _ensureMirillaOpen() {
+    const m = document.getElementById('mirilla');
+    m.style.transition = 'none';
+    m.classList.add('mirilla--open');
+    requestAnimationFrame(() => { m.style.transition = ''; });
   },
 
   // Helper: get first N img elements from the current strip

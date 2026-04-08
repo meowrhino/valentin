@@ -49,14 +49,15 @@ const Home = {
     // Update footer with first project
     this._updateFooterProject();
 
-    // Resize handler
-    this._onResize = Utils.debounce(() => this._resizeAll(), 150);
-    window.addEventListener('resize', this._onResize);
+    // Resize handler (only bind once)
+    if (!this._bound) {
+      this._onResize = Utils.debounce(() => this._resizeAll(), 150);
+      window.addEventListener('resize', this._onResize);
+      this.strip.addEventListener('transitionend', () => this._onTransitionEnd());
+      this._bindScroll();
+      this._bound = true;
+    }
 
-    // Listen for transition end to handle clone→real jumps
-    this.strip.addEventListener('transitionend', () => this._onTransitionEnd());
-
-    this._bindScroll();
     this._goTo(this.currentSlide, false);
   },
 
@@ -79,7 +80,7 @@ const Home = {
     return slide;
   },
 
-  _cloneSlide(slide, mapEntry) {
+  _cloneSlide(slide) {
     const clone = slide.cloneNode(true);
     clone.classList.add('slide--clone');
     // Re-attach load listener for the cloned img
@@ -208,11 +209,23 @@ const Home = {
     this._updateFooterProject();
   },
 
+  // Scroll to the first image of a project by project index
+  scrollToProject(projectIndex) {
+    // Find the first slide in slideMap that matches this project index
+    // (offset by 1 because index 0 is the clone)
+    for (let i = 1; i <= this.realCount; i++) {
+      if (this.slideMap[i] && this.slideMap[i].projectIndex === projectIndex) {
+        this._goTo(i);
+        return;
+      }
+    }
+  },
+
   _updateFooterProject() {
     const map = this.slideMap[this.currentSlide];
     if (map) {
       const project = App.state.projects[map.projectIndex];
-      Footer.setHomeName(project.nombre);
+      Footer.setHomeName(project.nombre, project.fecha);
       Footer.setLenguetaProject(project);
     }
   },
