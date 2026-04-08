@@ -88,14 +88,15 @@ const Footer = {
     this.els.projectName.style.opacity = '0';
     this.lenguetaOpen = true;
 
-    // Bind click handlers — scroll to project's first image in home strip
-    this.els.lenguetaContent.querySelectorAll('.lengueta__item').forEach(item => {
-      item.addEventListener('click', (e) => {
-        const idx = parseInt(e.target.dataset.projectIndex);
-        this.closeLengueta();
-        Home.scrollToProject(idx);
-      });
-    });
+    // Event delegation — single listener on container (no leak on rebuild)
+    this.els.lenguetaContent.onclick = (e) => {
+      const item = e.target.closest('.lengueta__item');
+      if (!item) return;
+      const idx = parseInt(item.dataset.projectIndex);
+      if (isNaN(idx)) return;
+      this.closeLengueta();
+      Home.scrollToProject(idx);
+    };
 
     // Close on click outside (deferred to avoid immediate trigger)
     setTimeout(() => {

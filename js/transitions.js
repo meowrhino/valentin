@@ -108,7 +108,8 @@ const Transitions = {
     // Set each cell's background to show its portion of the image
     // Use cover-like sizing to match how images display in the viewer
     const vw = window.innerWidth;
-    const vh = window.innerHeight - 48; // viewer height (viewport minus footer)
+    const footerH = document.getElementById('footer').offsetHeight;
+    const vh = window.innerHeight - footerH; // viewer height
     const imgW = targetImg.naturalWidth;
     const imgH = targetImg.naturalHeight;
 

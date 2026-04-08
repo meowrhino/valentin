@@ -167,7 +167,6 @@ html, body {
   left: 0;
   right: 0;
   height: calc(var(--mirilla-size) + var(--footer-h));
-  pointer-events: none;
 }
 
 /* When mirilla is open (project view) */
@@ -232,7 +231,6 @@ html, body {
   flex: 0 0 auto;
   padding: 0 1rem;
   white-space: nowrap;
-  z-index: 2;
 }
 
 .footer__center {

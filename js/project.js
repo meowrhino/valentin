@@ -40,8 +40,7 @@ const Project = {
     Utils.lazyWindow(this.slides, this.currentSlide, LAZY_RADIUS);
     this._goTo(this.currentSlide, false);
 
-    // Update footer
-    Footer.showProject(project.nombre, project.fecha);
+    // Note: footer mode switch is handled by App (not here) for proper timing
   },
 
   _buildFromArchive(project) {
@@ -176,7 +175,7 @@ const Project = {
     this.strip.innerHTML = '';
     this.slides = [];
     this.projectData = null;
-    Footer.showHome();
+    // Note: footer mode switch is handled by App (not here) for proper timing
   },
 
   bindScroll() {

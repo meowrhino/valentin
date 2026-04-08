@@ -10,7 +10,8 @@ const App = {
     data: null,
     projects: [],
     currentProjectIndex: null,
-    homeSlidePos: 0,
+    savedPositions: { commercial: 0, personal: 0 },
+    aboutSlidePos: 0,
   },
 
   async init() {
@@ -86,15 +87,24 @@ const App = {
       ? this.state.data.projects
       : this.state.data.personalProjects;
 
+    if (!newProjects || !newProjects.length) {
+      this.state.view = 'home';
+      return;
+    }
+
     // Get first image of first project in new mode for the grid transition
     const firstProject = newProjects[0];
     const firstImgSrc = Utils.imgPath(firstProject.slug, firstProject.fotosHome[0], firstProject.imgExt);
 
+    // Save current mode position before switching
+    this.state.savedPositions[this.state.mode] = Home.getPosition();
+
     await Transitions.gridTransition(firstImgSrc, () => {
       this.state.mode = newMode;
       this.state.projects = newProjects;
-      this.state.homeSlidePos = 0;
       Home.init(this.state.projects);
+      // Restore saved position for the new mode
+      Home.setPosition(this.state.savedPositions[newMode]);
       Footer.updateSwitchIcon(newMode);
     });
 
@@ -109,15 +119,21 @@ const App = {
     this.state.view = 'transitioning';
 
     const about = this.state.data.about;
-    this.state.homeSlidePos = Home.getPosition();
+    this.state.savedPositions[this.state.mode] = Home.getPosition();
 
     const firstImgSrc = Utils.imgPath(about.slug, 1, about.imgExt);
+    const savedAboutPos = this.state.aboutSlidePos;
     await Transitions.gridTransition(firstImgSrc, () => {
       this.state.currentProjectIndex = -1; // special: about
       Project.open(about, null);
+      // Restore saved about position
+      if (savedAboutPos > 0) {
+        Project._goTo(savedAboutPos, false);
+      }
       this._ensureMirillaOpen();
     });
 
+    Footer.showProject(about.nombre, about.fecha);
     history.pushState(null, '', '/about');
     this.state.view = 'project';
   },
@@ -128,8 +144,8 @@ const App = {
     if (this.state.view === 'transitioning') return;
     this.state.view = 'transitioning';
 
-    // Save home position
-    this.state.homeSlidePos = Home.getPosition();
+    // Save home position for current mode
+    this.state.savedPositions[this.state.mode] = Home.getPosition();
     this.state.currentProjectIndex = projectIndex;
 
     const project = this.state.projects[projectIndex];
@@ -140,8 +156,11 @@ const App = {
     // Build project slides (hidden behind mirilla)
     Project.open(project, startPhotoNum);
 
+    // Switch footer with crossfade
+    Footer.showProject(project.nombre, project.fecha);
+
     // Open mirilla — wait for first few images to load
-    const firstImages = this.strip_querySelectorAll_imgs(3);
+    const firstImages = this._getFirstStripImages(3);
     await Transitions.openMirillaWithLoading(firstImages);
 
     this.state.view = 'project';
@@ -151,16 +170,24 @@ const App = {
     if (this.state.view === 'transitioning') return;
     this.state.view = 'transitioning';
 
+    // Save about position if coming from about
+    if (this.state.currentProjectIndex === -1) {
+      this.state.aboutSlidePos = Project.currentSlide;
+    }
+
     // Stop audio
     AudioPlayer.stopAll();
+
+    // Switch footer back with crossfade
+    Footer.showHome();
 
     // Close mirilla
     await Transitions.closeMirilla();
 
-    // Restore home
+    // Restore home at saved position for current mode
     Project.close();
     Home.show();
-    Home.setPosition(this.state.homeSlidePos);
+    Home.setPosition(this.state.savedPositions[this.state.mode]);
 
     // Update URL
     history.pushState(null, '', '/');
@@ -182,6 +209,7 @@ const App = {
         this.state.currentProjectIndex = 0;
         Project.open(firstProject, null);
       });
+      Footer.showProject(firstProject.nombre, firstProject.fecha);
       history.pushState(null, '', `/project/${firstProject.slug}`);
       this.state.view = 'project';
       return;
@@ -200,6 +228,9 @@ const App = {
       Project.open(nextProject, null);
     });
 
+    // Update footer marquee text
+    Footer.showProject(nextProject.nombre, nextProject.fecha);
+
     // Update URL
     history.pushState(null, '', `/project/${nextProject.slug}`);
 
@@ -215,7 +246,7 @@ const App = {
   },
 
   // Helper: get first N img elements from the current strip
-  strip_querySelectorAll_imgs(n) {
+  _getFirstStripImages(n) {
     const strip = document.getElementById('strip');
     const imgs = strip.querySelectorAll('img[data-src]');
     const result = [];
