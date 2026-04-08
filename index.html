@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>valentin barrio</title>
+  <meta name="description" content="valentin barrio — photography portfolio">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Viewer -->
+  <div id="viewer">
+    <div id="strip"></div>
+  </div>
+
+  <!-- Mirilla overlays -->
+  <div id="mirilla">
+    <div class="mirilla mirilla--top"></div>
+    <div class="mirilla mirilla--bottom"></div>
+  </div>
+
+  <!-- Footer -->
+  <footer id="footer">
+    <!-- Home mode -->
+    <div id="footer-home">
+      <div class="footer__left">valentin barrio</div>
+      <div class="footer__center" id="footer-project-name"></div>
+      <div class="footer__right" id="footer-switch">personal</div>
+    </div>
+    <!-- Project mode -->
+    <div id="footer-project">
+      <div class="footer__arrow" id="btn-back">&larr;</div>
+      <div class="footer__marquee">
+        <div class="footer__marquee-inner" id="marquee-text"></div>
+      </div>
+      <div class="footer__arrow" id="btn-next">&rarr;</div>
+    </div>
+  </footer>
+
+  <!-- 8x8 Grid Transition overlay -->
+  <div id="grid-transition"></div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/footer.js"></script>
+  <script src="/js/audio-player.js"></script>
+  <script src="/js/home.js"></script>
+  <script src="/js/project.js"></script>
+  <script src="/js/transitions.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

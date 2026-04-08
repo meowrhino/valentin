@@ -1,0 +1,137 @@
+{
+  "meta": {
+    "nombre": "valentin barrio"
+  },
+  "projects": [
+    {
+      "slug": "bolder",
+      "nombre": "Bolder",
+      "imgCount": 5,
+      "imgCountArchive": 7,
+      "fotosHome": [1, 3, 5],
+      "fichaTecnica": [],
+      "lugar": "",
+      "descripcion": "",
+      "fecha": "",
+      "team": [],
+      "contenido": null
+    },
+    {
+      "slug": "brunch",
+      "nombre": "Brunch",
+      "imgCount": 40,
+      "imgCountArchive": 81,
+      "fotosHome": [1, 12, 25],
+      "fichaTecnica": [],
+      "lugar": "",
+      "descripcion": "",
+      "fecha": "",
+      "team": [],
+      "contenido": null
+    },
+    {
+      "slug": "kalaRos",
+      "nombre": "Kala Ros",
+      "imgCount": 5,
+      "imgCountArchive": 7,
+      "fotosHome": [1, 3, 5],
+      "fichaTecnica": [],
+      "lugar": "",
+      "descripcion": "",
+      "fecha": "",
+      "team": [],
+      "contenido": null
+    },
+    {
+      "slug": "kult",
+      "nombre": "Kult",
+      "imgCount": 7,
+      "imgCountArchive": 9,
+      "fotosHome": [1, 4, 7],
+      "fichaTecnica": [],
+      "lugar": "",
+      "descripcion": "",
+      "fecha": "",
+      "team": [],
+      "contenido": null
+    },
+    {
+      "slug": "lucho",
+      "nombre": "Lucho",
+      "imgCount": 8,
+      "imgCountArchive": 12,
+      "fotosHome": [1, 5, 9],
+      "fichaTecnica": [],
+      "lugar": "",
+      "descripcion": "",
+      "fecha": "",
+      "team": [],
+      "contenido": null
+    },
+    {
+      "slug": "lynn",
+      "nombre": "Lynn",
+      "imgCount": 7,
+      "imgCountArchive": 10,
+      "fotosHome": [1, 4, 7],
+      "fichaTecnica": [],
+      "lugar": "",
+      "descripcion": "",
+      "fecha": "",
+      "team": [],
+      "contenido": null
+    },
+    {
+      "slug": "razz",
+      "nombre": "Razz",
+      "imgCount": 12,
+      "imgCountArchive": 19,
+      "fotosHome": [1, 7, 13],
+      "fichaTecnica": [],
+      "lugar": "",
+      "descripcion": "",
+      "fecha": "",
+      "team": [],
+      "contenido": null
+    },
+    {
+      "slug": "santana",
+      "nombre": "Santana",
+      "imgCount": 7,
+      "imgCountArchive": 10,
+      "fotosHome": [1, 4, 7],
+      "fichaTecnica": [],
+      "lugar": "",
+      "descripcion": "",
+      "fecha": "",
+      "team": [],
+      "contenido": null
+    },
+    {
+      "slug": "soundit",
+      "nombre": "Soundit",
+      "imgCount": 35,
+      "imgCountArchive": 71,
+      "fotosHome": [1, 20, 40],
+      "fichaTecnica": [],
+      "lugar": "",
+      "descripcion": "",
+      "fecha": "",
+      "team": [],
+      "contenido": null
+    },
+    {
+      "slug": "yu",
+      "nombre": "Yu",
+      "imgCount": 10,
+      "imgCountArchive": 17,
+      "fotosHome": [1, 6, 12],
+      "fichaTecnica": [],
+      "lugar": "",
+      "descripcion": "",
+      "fecha": "",
+      "team": [],
+      "contenido": null
+    }
+  ]
+}

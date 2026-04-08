@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script>
+    // Clean URL routing for static hosting (GitHub Pages, etc.)
+    // Redirects /project/slug to index.html with the path preserved
+    const path = window.location.pathname;
+    sessionStorage.setItem('route', path);
+    window.location.replace('/');
+  </script>
+</head>
+<body></body>
+</html>
