@@ -2,6 +2,8 @@
    App — main orchestrator, state, routing
    ============================================ */
 
+const BASE = new URL(document.baseURI).pathname; // '/valentin/' on GH Pages
+
 const App = {
 
   state: {
@@ -17,7 +19,7 @@ const App = {
   async init() {
     // Fetch data
     try {
-      const res = await fetch('/data.json');
+      const res = await fetch('data.json');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       this.state.data = await res.json();
     } catch (err) {
@@ -52,7 +54,7 @@ const App = {
     const savedRoute = sessionStorage.getItem('route');
     if (savedRoute) {
       sessionStorage.removeItem('route');
-      const match = savedRoute.match(/^\/project\/(.+)$/);
+      const match = savedRoute.match(/^\/?project\/(.+)$/);
       if (match) {
         const slug = match[1];
         const idx = this.state.projects.findIndex(p => p.slug === slug);
@@ -63,9 +65,11 @@ const App = {
       }
     }
 
-    // Check current path
-    const path = window.location.pathname;
-    const match = path.match(/^\/project\/(.+)$/);
+    // Check current path (strip base prefix)
+    const path = window.location.pathname.startsWith(BASE)
+      ? window.location.pathname.slice(BASE.length)
+      : window.location.pathname;
+    const match = path.match(/^project\/(.+)$/);
     if (match) {
       const slug = match[1];
       const idx = this.state.projects.findIndex(p => p.slug === slug);
@@ -108,7 +112,7 @@ const App = {
       Footer.updateSwitchIcon(newMode);
     });
 
-    history.pushState(null, '', '/');
+    history.pushState(null, '', BASE);
     this.state.view = 'home';
   },
 
@@ -134,7 +138,7 @@ const App = {
     });
 
     Footer.showProject(about.nombre, about.fecha);
-    history.pushState(null, '', '/about');
+    history.pushState(null, '', `${BASE}about`);
     this.state.view = 'project';
   },
 
@@ -151,7 +155,7 @@ const App = {
     const project = this.state.projects[projectIndex];
 
     // Update URL
-    history.pushState(null, '', `/project/${project.slug}`);
+    history.pushState(null, '', `${BASE}project/${project.slug}`);
 
     // Build project slides (hidden behind mirilla)
     Project.open(project, startPhotoNum);
@@ -190,7 +194,7 @@ const App = {
     Home.setPosition(this.state.savedPositions[this.state.mode]);
 
     // Update URL
-    history.pushState(null, '', '/');
+    history.pushState(null, '', BASE);
 
     this.state.currentProjectIndex = null;
     this.state.view = 'home';
@@ -210,7 +214,7 @@ const App = {
         Project.open(firstProject, null);
       });
       Footer.showProject(firstProject.nombre, firstProject.fecha);
-      history.pushState(null, '', `/project/${firstProject.slug}`);
+      history.pushState(null, '', `${BASE}project/${firstProject.slug}`);
       this.state.view = 'project';
       return;
     }
@@ -232,7 +236,7 @@ const App = {
     Footer.showProject(nextProject.nombre, nextProject.fecha);
 
     // Update URL
-    history.pushState(null, '', `/project/${nextProject.slug}`);
+    history.pushState(null, '', `${BASE}project/${nextProject.slug}`);
 
     this.state.view = 'project';
   },
@@ -263,13 +267,14 @@ const App = {
 
 // Handle browser back/forward
 window.addEventListener('popstate', () => {
-  const path = window.location.pathname;
-  if (path === '/' || path === '') {
+  const raw = window.location.pathname;
+  const path = raw.startsWith(BASE) ? raw.slice(BASE.length) : raw;
+  if (path === '' || path === '/') {
     if (App.state.view === 'project') {
       App.exitProject();
     }
   } else {
-    const match = path.match(/^\/project\/(.+)$/);
+    const match = path.match(/^project\/(.+)$/);
     if (match) {
       const slug = match[1];
       const idx = App.state.projects.findIndex(p => p.slug === slug);

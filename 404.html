@@ -5,9 +5,12 @@
   <script>
     // Clean URL routing for static hosting (GitHub Pages, etc.)
     // Redirects /project/slug to index.html with the path preserved
+    const base = '/valentin/';
     const path = window.location.pathname;
-    sessionStorage.setItem('route', path);
-    window.location.replace('/');
+    // Strip base prefix before storing route
+    const route = path.startsWith(base) ? '/' + path.slice(base.length) : path;
+    sessionStorage.setItem('route', route);
+    window.location.replace(base);
   </script>
 </head>
 <body></body>

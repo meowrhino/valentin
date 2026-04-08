@@ -57,7 +57,7 @@ const Project = {
       } else if (item.tipo === 'texto') {
         this._addTextSlide(item.contenido);
       } else if (item.tipo === 'audio') {
-        this._addAudioSlide(`/_PROJECTS/${project.slug}/${item.src}`);
+        this._addAudioSlide(`_PROJECTS/${project.slug}/${item.src}`);
       }
     });
     this._addFichaTecnicaSlide(project);
