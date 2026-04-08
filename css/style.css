@@ -173,9 +173,9 @@ html, body {
   align-items: center;
   z-index: 15;
   background: #000;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
 }
 
 /* Home footer */
@@ -194,20 +194,22 @@ html, body {
   white-space: nowrap;
 }
 
-/* Project footer */
+/* Project footer — marquee full-width, arrows float on top */
+#footer-project {
+  position: relative;
+}
+
 .footer__arrow {
-  flex: 0 0 auto;
+  position: absolute;
+  top: 0;
+  height: 100%;
   padding: 0 1.5rem;
   cursor: pointer;
   z-index: 3;
-  position: relative;
   background: #000;
-  height: 100%;
   display: flex;
   align-items: center;
   transition: opacity 0.2s;
-  min-width: 56px;
-  justify-content: center;
   font-size: 1rem;
   letter-spacing: 0;
 }
@@ -216,25 +218,26 @@ html, body {
   opacity: 0.6;
 }
 
-/* Marquee container */
+#btn-back { left: 0; }
+#btn-next { right: 0; }
+
+/* Marquee container — full width, passes under arrows */
 .footer__marquee {
-  flex: 1;
+  width: 100%;
   overflow: hidden;
   position: relative;
-  pointer-events: none;
-  min-width: 0;
 }
 
 .footer__marquee-inner {
   display: inline-flex;
   white-space: nowrap;
-  animation: marquee 12s linear infinite;
+  animation: marquee 30s linear infinite;
   mix-blend-mode: difference;
   color: #fff;
 }
 
 .footer__marquee-inner span {
-  padding: 0 2rem;
+  padding: 0 4rem;
 }
 
 @keyframes marquee {
@@ -243,11 +246,73 @@ html, body {
 }
 
 /* Footer modes */
-#footer-home { display: flex; width: 100%; }
+#footer-home { display: flex; width: 100%; position: relative; }
 #footer-project { display: none; width: 100%; overflow: hidden; }
 
 .view-project #footer-home { display: none; }
 .view-project #footer-project { display: flex; }
+
+/* Footer interactive elements */
+.footer__left, .footer__right { cursor: pointer; }
+.footer__left:hover, .footer__right:hover { opacity: 0.6; }
+.footer__center { cursor: pointer; }
+.footer__center:hover { opacity: 0.6; }
+
+/* --- Lengüeta (project info tab) --- */
+
+.lengueta {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #000;
+  border: 1px solid #fff;
+  border-bottom: none;
+  padding: 1.2rem 1.5rem;
+  min-width: 280px;
+  max-width: 400px;
+  z-index: 5;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+/* Cover the footer border where lengüeta meets it */
+.lengueta::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #000;
+}
+
+.lengueta__content p {
+  margin-bottom: 0.6rem;
+}
+
+.lengueta__content p:last-child {
+  margin-bottom: 0;
+}
+
+.lengueta__content .lengueta__label {
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.65rem;
+}
+
+.lengueta__content a {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.lengueta__content a:hover {
+  opacity: 0.6;
+}
 
 /* --- 8x8 Grid Transition --- */
 

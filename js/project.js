@@ -67,7 +67,7 @@ const Project = {
     slide.dataset.photoNum = num;
 
     const img = document.createElement('img');
-    img.dataset.src = Utils.imgPath(slug, num);
+    img.dataset.src = Utils.imgPath(slug, num, this.projectData?.imgExt);
     img.alt = '';
 
     img.addEventListener('load', () => {

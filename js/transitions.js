@@ -113,13 +113,20 @@ const Transitions = {
       cell.style.opacity = '0';
     }, 20);
 
-    // Clean up
+    // Clean up — disable transitions before hiding to prevent ghost flicker
     await new Promise(r => setTimeout(r, 200));
-    grid.classList.remove('active');
     cells.forEach(cell => {
+      cell.style.transition = 'none';
       cell.style.opacity = '0';
       cell.style.backgroundImage = 'none';
       cell.style.background = '#000';
+    });
+    grid.classList.remove('active');
+    // Re-enable transitions after a frame
+    requestAnimationFrame(() => {
+      cells.forEach(cell => {
+        cell.style.transition = '';
+      });
     });
   },
 

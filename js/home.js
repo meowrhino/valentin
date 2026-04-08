@@ -31,7 +31,7 @@ const Home = {
         slide.dataset.photoNum = num;
 
         const img = document.createElement('img');
-        img.dataset.src = Utils.imgPath(project.slug, num);
+        img.dataset.src = Utils.imgPath(project.slug, num, project.imgExt);
         img.alt = project.nombre;
 
         img.addEventListener('load', () => {
@@ -158,6 +158,7 @@ const Home = {
     if (map) {
       const project = App.state.projects[map.projectIndex];
       Footer.setHomeName(project.nombre);
+      Footer.setLenguetaProject(project);
     }
   },
 

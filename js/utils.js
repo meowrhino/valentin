@@ -5,8 +5,8 @@
 const Utils = {
 
   // Build image path for a project
-  imgPath(slug, num) {
-    return `/_PROJECTS/${slug}/${num}.webp`;
+  imgPath(slug, num, ext) {
+    return `/_PROJECTS/${slug}/${num}.${ext || 'webp'}`;
   },
 
   // Detect if image is "more horizontal" than the container

@@ -6,6 +6,8 @@ const App = {
 
   state: {
     view: 'home',          // 'home' | 'project' | 'transitioning'
+    mode: 'commercial',    // 'commercial' | 'personal'
+    data: null,
     projects: [],
     currentProjectIndex: null,
     homeSlidePos: 0,
@@ -14,8 +16,8 @@ const App = {
   async init() {
     // Fetch data
     const res = await fetch('/data.json');
-    const data = await res.json();
-    this.state.projects = data.projects;
+    this.state.data = await res.json();
+    this.state.projects = this.state.data.projects;
 
     // Init modules
     Footer.init();
@@ -26,6 +28,12 @@ const App = {
     // Footer arrow handlers
     Footer.onBack(() => this.exitProject());
     Footer.onNext(() => this.nextProject());
+
+    // Switch mode handler
+    Footer.onSwitch(() => this.switchMode());
+
+    // About handler
+    Footer.onAbout(() => this.enterAbout());
 
     // Handle clean URL routing
     this._handleRoute();
@@ -58,6 +66,53 @@ const App = {
         return;
       }
     }
+  },
+
+  // --- Mode switching ---
+
+  async switchMode() {
+    if (this.state.view === 'transitioning') return;
+    this.state.view = 'transitioning';
+
+    const newMode = this.state.mode === 'commercial' ? 'personal' : 'commercial';
+    const newProjects = newMode === 'commercial'
+      ? this.state.data.projects
+      : this.state.data.personalProjects;
+
+    // Get first image of first project in new mode for the grid transition
+    const firstProject = newProjects[0];
+    const firstImgSrc = Utils.imgPath(firstProject.slug, firstProject.fotosHome[0], firstProject.imgExt);
+
+    await Transitions.gridTransition(firstImgSrc);
+
+    this.state.mode = newMode;
+    this.state.projects = newProjects;
+    this.state.homeSlidePos = 0;
+
+    Home.init(this.state.projects);
+    Footer.updateSwitchIcon(newMode);
+
+    history.pushState(null, '', '/');
+    this.state.view = 'home';
+  },
+
+  // --- About ---
+
+  async enterAbout() {
+    if (this.state.view === 'transitioning') return;
+    this.state.view = 'transitioning';
+
+    const about = this.state.data.about;
+    this.state.homeSlidePos = Home.getPosition();
+
+    const firstImgSrc = Utils.imgPath(about.slug, 1, about.imgExt);
+    await Transitions.gridTransition(firstImgSrc);
+
+    this.state.currentProjectIndex = -1; // special: about
+    Project.open(about, null);
+
+    history.pushState(null, '', '/about');
+    this.state.view = 'project';
   },
 
   // --- Navigation ---
@@ -111,9 +166,22 @@ const App = {
     if (this.state.view === 'transitioning') return;
     this.state.view = 'transitioning';
 
+    // If in about, go to first project
+    if (this.state.currentProjectIndex === -1) {
+      const firstProject = this.state.projects[0];
+      const firstImgSrc = Utils.imgPath(firstProject.slug, 1, firstProject.imgExt);
+      AudioPlayer.stopAll();
+      await Transitions.gridTransition(firstImgSrc);
+      this.state.currentProjectIndex = 0;
+      Project.open(firstProject, null);
+      history.pushState(null, '', `/project/${firstProject.slug}`);
+      this.state.view = 'project';
+      return;
+    }
+
     const nextIdx = (this.state.currentProjectIndex + 1) % this.state.projects.length;
     const nextProject = this.state.projects[nextIdx];
-    const firstImgSrc = Utils.imgPath(nextProject.slug, 1);
+    const firstImgSrc = Utils.imgPath(nextProject.slug, 1, nextProject.imgExt);
 
     // Stop current audio
     AudioPlayer.stopAll();
@@ -157,7 +225,8 @@ window.addEventListener('popstate', () => {
   } else {
     const match = path.match(/^\/project\/(.+)$/);
     if (match) {
-      const idx = App.state.projects.findIndex(p => p.slug === match[1]);
+      const slug = match[1];
+      const idx = App.state.projects.findIndex(p => p.slug === slug);
       if (idx >= 0 && App.state.view === 'home') {
         App.enterProject(idx, null);
       }
