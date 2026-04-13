@@ -16,6 +16,8 @@ const App = {
     currentProjectIndex: null,
     savedPositions: { commercial: 0, personal: 0 },
     aboutSlidePos: 0,
+    typeFilter: 'all',
+    allProjects: [],  // unfiltered projects for current mode
   },
 
   async init() {
@@ -26,20 +28,20 @@ const App = {
       this.state.data = await res.json();
     } catch (err) {
       console.error('Failed to load data:', err);
+      document.body.style.cssText = 'display:flex;align-items:center;justify-content:center;color:#666;font-family:monospace;font-size:0.9rem';
+      document.body.textContent = 'Failed to load — please refresh';
       return;
     }
-    this.state.projects = this.state.data.projects;
+    this.state.allProjects = this._sortByType(this.state.data.projects);
+    this.state.projects = this.state.allProjects;
 
     // Init modules
     Footer.init();
     Footer.updateSwitchIcon(this.state.mode);
     Transitions.init();
+    Utils.fitMode = this._homeFitMode();
     Home.init(this.state.projects);
     Project.bindScroll();
-
-    // Footer arrow handlers
-    Footer.onBack(() => this.exitProject());
-    Footer.onNext(() => this.nextProject());
 
     // Switch mode handler
     Footer.onSwitch(() => this.switchMode());
@@ -47,47 +49,41 @@ const App = {
     // About handler
     Footer.onAbout(() => this.enterAbout());
 
-    // Toggle cover/contain with C key (for testing)
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'c' || e.key === 'C') {
-        Utils.fitMode = Utils.fitMode === 'cover' ? 'contain' : 'cover';
-        console.log('Fit mode:', Utils.fitMode);
-        Home._resizeAll();
-        Project._resizeAll();
-      }
-    });
-
     // Handle clean URL routing
     this._handleRoute();
   },
 
   _handleRoute() {
+    let slug = null;
+
     // Check if 404.html stored a route
     const savedRoute = sessionStorage.getItem('route');
     if (savedRoute) {
       sessionStorage.removeItem('route');
       const match = savedRoute.match(/^\/?project\/(.+)$/);
-      if (match) {
-        const slug = match[1];
-        const idx = this.state.projects.findIndex(p => p.slug === slug);
-        if (idx >= 0) {
-          this.enterProject(idx, null);
-          return;
-        }
-      }
+      if (match) slug = match[1];
     }
 
     // Check current path (strip base prefix)
-    const path = window.location.pathname.startsWith(BASE)
-      ? window.location.pathname.slice(BASE.length)
-      : window.location.pathname;
-    const match = path.match(/^project\/(.+)$/);
-    if (match) {
-      const slug = match[1];
+    if (!slug) {
+      const path = window.location.pathname.startsWith(BASE)
+        ? window.location.pathname.slice(BASE.length)
+        : window.location.pathname;
+      const match = path.match(/^project\/(.+)$/);
+      if (match) slug = match[1];
+    }
+
+    if (slug) {
       const idx = this.state.projects.findIndex(p => p.slug === slug);
       if (idx >= 0) {
-        this.enterProject(idx, null);
-        return;
+        // Direct entry — no transition, just show project immediately
+        this.state.currentProjectIndex = idx;
+        const project = this.state.projects[idx];
+        Utils.fitMode = 'contain';
+        Project.open(project, null);
+        Footer.showProject(project.nombre, project.fecha);
+        this._ensureMirillaOpen();
+        this.state.view = 'project';
       }
     }
   },
@@ -99,9 +95,11 @@ const App = {
     this.state.view = 'transitioning';
 
     const newMode = this.state.mode === 'commercial' ? 'personal' : 'commercial';
-    const newProjects = newMode === 'commercial'
-      ? this.state.data.projects
-      : this.state.data.personalProjects;
+    const newProjects = this._sortByType(
+      newMode === 'commercial'
+        ? this.state.data.projects
+        : this.state.data.personalProjects
+    );
 
     if (!newProjects || !newProjects.length) {
       this.state.view = 'home';
@@ -115,14 +113,19 @@ const App = {
     // Save current mode position before switching
     this.state.savedPositions[this.state.mode] = Home.getPosition();
 
+    const homeFit = this._homeFitMode();
     await Transitions.gridTransition(firstImgSrc, () => {
+
+      Utils.fitMode = homeFit;
       this.state.mode = newMode;
+      this.state.allProjects = newProjects;
       this.state.projects = newProjects;
+      this.state.typeFilter = 'all';
       Home.init(this.state.projects);
       // Restore saved position for the new mode
       Home.setPosition(this.state.savedPositions[newMode]);
       Footer.updateSwitchIcon(newMode);
-    });
+    }, homeFit);
 
     history.pushState(null, '', BASE);
     this.state.view = 'home';
@@ -144,6 +147,7 @@ const App = {
     Footer.showProject(about.nombre, about.fecha);
 
     await Transitions.gridTransition(firstImgSrc, () => {
+      Utils.fitMode = 'contain';
       this.state.currentProjectIndex = -1; // special: about
       Project.open(about, null);
       // Restore saved about position
@@ -151,7 +155,7 @@ const App = {
         Project._goTo(savedAboutPos, false);
       }
       this._ensureMirillaOpen();
-    });
+    }, 'contain');
 
     history.pushState(null, '', `${BASE}about`);
     this.state.view = 'project';
@@ -172,15 +176,23 @@ const App = {
     // Update URL
     history.pushState(null, '', `${BASE}project/${project.slug}`);
 
-    // Build project slides (hidden behind mirilla)
-    Project.open(project, startPhotoNum);
-
     // Switch footer with crossfade
     Footer.showProject(project.nombre, project.fecha);
 
-    // Open mirilla — wait for first few images to load
-    const firstImages = this._getFirstStripImages(3);
-    await Transitions.openMirillaWithLoading(firstImages);
+    // Mobile: use grid transition; Desktop: use mirilla
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      const firstImgSrc = Utils.imgPath(project.slug, startPhotoNum || 1, project.imgExt);
+      await Transitions.gridTransition(firstImgSrc, () => {
+        Utils.fitMode = 'contain';
+        Project.open(project, startPhotoNum);
+      }, 'contain');
+    } else {
+      Utils.fitMode = 'contain';
+      Project.open(project, startPhotoNum);
+      const firstImages = this._getFirstStripImages(3);
+      await Transitions.openMirillaWithLoading(firstImages);
+    }
 
     this.state.view = 'project';
   },
@@ -200,13 +212,27 @@ const App = {
     // Switch footer back with crossfade
     Footer.showHome();
 
-    // Close mirilla
-    await Transitions.closeMirilla();
+    const isMobile = window.innerWidth <= 768;
+    const homeFit = this._homeFitMode();
 
-    // Restore home at saved position for current mode
-    Project.close();
-    Home.show();
-    Home.setPosition(this.state.savedPositions[this.state.mode]);
+    if (isMobile) {
+      // Mobile: use grid transition to go back to home
+      const currentProject = this.state.projects[0]; // first project for grid image
+      const firstImgSrc = Utils.imgPath(currentProject.slug, currentProject.fotosHome[0], currentProject.imgExt);
+      await Transitions.gridTransition(firstImgSrc, () => {
+        Utils.fitMode = homeFit;
+        Project.close();
+        Home.show();
+        Home.setPosition(this.state.savedPositions[this.state.mode]);
+      }, homeFit);
+    } else {
+      // Desktop: close mirilla
+      await Transitions.closeMirilla();
+      Utils.fitMode = homeFit;
+      Project.close();
+      Home.show();
+      Home.setPosition(this.state.savedPositions[this.state.mode]);
+    }
 
     // Update URL
     history.pushState(null, '', BASE);
@@ -226,9 +252,10 @@ const App = {
       AudioPlayer.stopAll();
       Footer.showProject(firstProject.nombre, firstProject.fecha);
       await Transitions.gridTransition(firstImgSrc, () => {
+        Utils.fitMode = 'contain';
         this.state.currentProjectIndex = 0;
         Project.open(firstProject, null);
-      });
+      }, 'contain');
       history.pushState(null, '', `${BASE}project/${firstProject.slug}`);
       this.state.view = 'project';
       return;
@@ -246,14 +273,101 @@ const App = {
 
     // Run 8x8 grid transition — update strip while screen is black
     await Transitions.gridTransition(firstImgSrc, () => {
+      Utils.fitMode = 'contain';
       this.state.currentProjectIndex = nextIdx;
       Project.open(nextProject, null);
-    });
+    }, 'contain');
 
     // Update URL
     history.pushState(null, '', `${BASE}project/${nextProject.slug}`);
 
     this.state.view = 'project';
+  },
+
+  // --- Previous project ---
+  async prevProject() {
+    if (this.state.view === 'transitioning') return;
+    if (this.state.currentProjectIndex === null || this.state.currentProjectIndex < 0) return;
+    this.state.view = 'transitioning';
+
+    const prevIdx = (this.state.currentProjectIndex - 1 + this.state.projects.length) % this.state.projects.length;
+    const prevProject = this.state.projects[prevIdx];
+    const firstImgSrc = Utils.imgPath(prevProject.slug, 1, prevProject.imgExt);
+
+    AudioPlayer.stopAll();
+    Footer.showProject(prevProject.nombre, prevProject.fecha);
+
+    await Transitions.gridTransition(firstImgSrc, () => {
+      Utils.fitMode = 'contain';
+      this.state.currentProjectIndex = prevIdx;
+      Project.open(prevProject, null);
+    }, 'contain');
+
+    history.pushState(null, '', `${BASE}project/${prevProject.slug}`);
+    this.state.view = 'project';
+  },
+
+  // --- Go to specific project (from project menu) ---
+  async goToProject(projectIndex) {
+    if (this.state.view === 'transitioning') return;
+    if (projectIndex === this.state.currentProjectIndex) return;
+    this.state.view = 'transitioning';
+
+    const project = this.state.projects[projectIndex];
+    const firstImgSrc = Utils.imgPath(project.slug, 1, project.imgExt);
+
+    AudioPlayer.stopAll();
+    Footer.showProject(project.nombre, project.fecha);
+
+    await Transitions.gridTransition(firstImgSrc, () => {
+      Utils.fitMode = 'contain';
+      this.state.currentProjectIndex = projectIndex;
+      Project.open(project, null);
+    }, 'contain');
+
+    history.pushState(null, '', `${BASE}project/${project.slug}`);
+    this.state.view = 'project';
+  },
+
+  // --- Filter by type (home) ---
+  async filterByType(type) {
+    if (this.state.view === 'transitioning') return;
+    this.state.view = 'transitioning';
+
+    this.state.typeFilter = type;
+    let filtered;
+    if (type === 'all') {
+      filtered = this.state.allProjects;
+    } else {
+      filtered = this.state.allProjects.filter(p =>
+        p.fichaTecnica && p.fichaTecnica.some(t => t.toLowerCase() === type)
+      );
+    }
+
+    if (!filtered.length) {
+      this.state.view = 'home';
+      return;
+    }
+
+    this.state.projects = filtered;
+    const firstProject = filtered[0];
+    const firstImgSrc = Utils.imgPath(firstProject.slug, firstProject.fotosHome[0], firstProject.imgExt);
+
+    this.state.savedPositions[this.state.mode] = Home.getPosition();
+
+    const homeFit = this._homeFitMode();
+    await Transitions.gridTransition(firstImgSrc, () => {
+      Utils.fitMode = homeFit;
+      Home.init(this.state.projects);
+    }, homeFit);
+
+    history.pushState(null, '', BASE);
+    this.state.view = 'home';
+  },
+
+  // Home fitMode: contain on mobile, cover on desktop
+  _homeFitMode() {
+    return window.innerWidth <= 768 ? 'contain' : 'cover';
   },
 
   // Instantly set mirilla to open state (no animation)
@@ -262,6 +376,23 @@ const App = {
     m.style.transition = 'none';
     m.classList.add('mirilla--open');
     requestAnimationFrame(() => { m.style.transition = ''; });
+  },
+
+  // Sort projects by type, preserving first-appearance order of types in the array
+  _sortByType(projects) {
+    if (!projects || !projects.length) return projects;
+    // Discover type order from first appearance
+    const typeOrder = [];
+    projects.forEach(p => {
+      const type = (p.fichaTecnica && p.fichaTecnica[0]) ? p.fichaTecnica[0].toLowerCase() : 'other';
+      if (!typeOrder.includes(type)) typeOrder.push(type);
+    });
+    // Stable sort: group by type, keep original order within each type
+    return [...projects].sort((a, b) => {
+      const typeA = (a.fichaTecnica && a.fichaTecnica[0]) ? a.fichaTecnica[0].toLowerCase() : 'other';
+      const typeB = (b.fichaTecnica && b.fichaTecnica[0]) ? b.fichaTecnica[0].toLowerCase() : 'other';
+      return typeOrder.indexOf(typeA) - typeOrder.indexOf(typeB);
+    });
   },
 
   // Helper: get first N img elements from the current strip

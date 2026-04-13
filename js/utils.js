@@ -14,8 +14,10 @@ const SLIDE_TRANSITION = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
 // Change these to adjust all animation speeds globally.
 // CSS var --transition-speed in style.css must match TRANSITION_MS.
 const TRANSITION_MS     = 800;   // mirilla slide + footer crossfade
-const GRID_STAGGER_MS   = 12;    // delay between each grid cell
-const GRID_CELL_FADE_MS = 150;   // individual cell opacity transition
+const GRID_STAGGER_MS   = 12;    // delay between each grid cell (blackout)
+const GRID_REVEAL_STAGGER_MS = 20; // delay between each grid cell (reveal — slower)
+const GRID_CELL_FADE_MS = 150;   // individual cell opacity transition (blackout)
+const GRID_REVEAL_FADE_MS = 300; // individual cell opacity transition (reveal — smoother)
 const GRID_PAUSE_MS     = 200;   // pause at full black before loading
 const GRID_CLEANUP_MS   = 200;   // pause before cleanup after reveal
 
@@ -155,12 +157,20 @@ const Utils = {
 
     element.addEventListener('touchstart', (e) => {
       if (!callbacks.isActive()) return;
+      // Only track single-finger swipes; ignore pinch-zoom
+      ctx._wasMultiTouch = e.touches.length > 1;
       ctx.touchStartX = e.touches[0].clientX;
       ctx.touchStartY = e.touches[0].clientY;
     }, { passive: true });
 
+    element.addEventListener('touchmove', (e) => {
+      // If a second finger appears during the gesture, mark as multi-touch
+      if (e.touches.length > 1) ctx._wasMultiTouch = true;
+    }, { passive: true });
+
     element.addEventListener('touchend', (e) => {
       if (!callbacks.isActive()) return;
+      if (ctx._wasMultiTouch) return; // ignore pinch-zoom gestures
       const dx = e.changedTouches[0].clientX - ctx.touchStartX;
       const dy = e.changedTouches[0].clientY - ctx.touchStartY;
       if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > TOUCH_MIN_SWIPE) {

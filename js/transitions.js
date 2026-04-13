@@ -65,7 +65,7 @@ const Transitions = {
   // --- 8x8 Grid Transition ---
 
   // Run the full blackout → reveal transition
-  async gridTransition(newFirstImageSrc, onBlackout) {
+  async gridTransition(newFirstImageSrc, onBlackout, fitMode) {
     const grid = this.gridEl;
     const cells = this.cells;
 
@@ -76,21 +76,20 @@ const Transitions = {
     const order1 = Utils.shuffle(Utils.range(64));
     await this._staggerCells(order1, cell => {
       cell.style.opacity = '1';
-      cell.style.backgroundImage = 'none';
       cell.style.background = '#000';
     }, GRID_STAGGER_MS);
 
     // Small pause at full black
     await new Promise(r => setTimeout(r, GRID_PAUSE_MS));
 
-    // Preload the target image (start early, before onBlackout)
-    const targetImg = new Image();
-    targetImg.src = newFirstImageSrc;
-
     // Execute callback while screen is fully black (update strip content)
     if (onBlackout) onBlackout();
 
-    // Wait for strip images to start loading
+    // Preload the target image so strip has it ready
+    const targetImg = new Image();
+    targetImg.src = newFirstImageSrc;
+
+    // Trigger first strip image load
     const stripImgs = document.querySelectorAll('#strip img[data-src]');
     const firstStripImg = stripImgs[0];
     if (firstStripImg && firstStripImg.dataset.src && !firstStripImg.src) {
@@ -105,40 +104,6 @@ const Transitions = {
       setTimeout(r, 3000);
     });
 
-    // Set each cell's background to show its portion of the image
-    // Use cover-like sizing to match how images display in the viewer
-    const vw = window.innerWidth;
-    const footerH = document.getElementById('footer').offsetHeight;
-    const vh = window.innerHeight - footerH; // viewer height
-    const imgW = targetImg.naturalWidth;
-    const imgH = targetImg.naturalHeight;
-
-    // Calculate cover dimensions (same as Utils.sizeImage logic)
-    let renderW, renderH;
-    if (imgW / imgH > vw / vh) {
-      // Image wider than viewport — fill height
-      renderH = vh;
-      renderW = (imgW / imgH) * vh;
-    } else {
-      // Image taller than viewport — fill width
-      renderW = vw;
-      renderH = (imgH / imgW) * vw;
-    }
-
-    // Center offset
-    const offsetX = (vw - renderW) / 2;
-    const offsetY = (vh - renderH) / 2;
-    const cellW = vw / 8;
-    const cellH = vh / 8;
-
-    cells.forEach((cell, i) => {
-      const col = i % 8;
-      const row = Math.floor(i / 8);
-      cell.style.backgroundImage = `url(${newFirstImageSrc})`;
-      cell.style.backgroundSize = `${renderW}px ${renderH}px`;
-      cell.style.backgroundPosition = `${offsetX - col * cellW}px ${offsetY - row * cellH}px`;
-    });
-
     // Wait for first strip image to be ready too
     if (firstStripImg && !firstStripImg.complete) {
       await new Promise(r => {
@@ -148,18 +113,24 @@ const Transitions = {
       });
     }
 
-    // Phase 2: Reveal — cells become transparent randomly
+    // Ensure browser has painted the strip content before revealing
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    // Phase 2: Reveal — cells become transparent randomly, showing strip behind
+    // Use slower timing for a smoother reveal effect
+    cells.forEach(cell => {
+      cell.style.transition = `opacity ${GRID_REVEAL_FADE_MS}ms ease`;
+    });
     const order2 = Utils.shuffle(Utils.range(64));
     await this._staggerCells(order2, cell => {
       cell.style.opacity = '0';
-    }, GRID_STAGGER_MS);
+    }, GRID_REVEAL_STAGGER_MS, GRID_REVEAL_FADE_MS);
 
-    // Clean up — disable transitions before hiding to prevent ghost flicker
+    // Clean up
     await new Promise(r => setTimeout(r, GRID_CLEANUP_MS));
     cells.forEach(cell => {
       cell.style.transition = 'none';
       cell.style.opacity = '0';
-      cell.style.backgroundImage = 'none';
       cell.style.background = '#000';
     });
     grid.classList.remove('active');
@@ -172,13 +143,14 @@ const Transitions = {
   },
 
   // Stagger an action across cells in a given order
-  _staggerCells(order, action, delayMs) {
+  _staggerCells(order, action, delayMs, fadeMs) {
+    fadeMs = fadeMs || GRID_CELL_FADE_MS;
     return new Promise(resolve => {
       order.forEach((idx, step) => {
         setTimeout(() => {
           action(this.cells[idx]);
           if (step === order.length - 1) {
-            setTimeout(resolve, GRID_CELL_FADE_MS); // wait for last transition
+            setTimeout(resolve, fadeMs); // wait for last transition
           }
         }, step * delayMs);
       });

@@ -138,6 +138,22 @@ const Project = {
     }
 
     slide.appendChild(container);
+
+    // Navigation buttons at bottom of ficha
+    const nav = document.createElement('div');
+    nav.className = 'ficha-nav';
+    const backBtn = document.createElement('span');
+    backBtn.className = 'ficha-nav__btn';
+    backBtn.textContent = '← back to home';
+    backBtn.addEventListener('click', () => App.exitProject());
+    const nextBtn = document.createElement('span');
+    nextBtn.className = 'ficha-nav__btn';
+    nextBtn.textContent = 'next project →';
+    nextBtn.addEventListener('click', () => App.nextProject());
+    nav.appendChild(backBtn);
+    nav.appendChild(nextBtn);
+    slide.appendChild(nav);
+
     this.strip.appendChild(slide);
     this.slides.push(slide);
   },
@@ -195,6 +211,17 @@ const Project = {
       next: () => this.next(),
       prev: () => this.prev(),
       isActive: () => App.state.view === 'project'
+    });
+
+    // Tap left/right side to navigate (mobile)
+    viewer.addEventListener('click', (e) => {
+      if (App.state.view !== 'project') return;
+      // Ignore clicks on interactive elements (buttons, links, audio player)
+      if (e.target.closest('a, button, .ficha-nav__btn, .audio-player')) return;
+      const x = e.clientX;
+      const w = window.innerWidth;
+      if (x < w / 3) this.prev();
+      else if (x > w * 2 / 3) this.next();
     });
 
     // Keyboard (project adds Escape)
