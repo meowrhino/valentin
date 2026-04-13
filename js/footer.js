@@ -19,12 +19,12 @@ const Footer = {
     this.els.lenguetaContent = document.getElementById('lengueta-content');
     this.els.marqueeWrap = document.querySelector('.footer__marquee');
 
-    // Toggle lengüeta on project name click (home mode)
+    // Home: project name (center) opens menu
     this.els.projectName.addEventListener('click', () => this.toggleLengueta());
 
-    // Toggle lengüeta on marquee click (project mode)
+    // Project: entire footer opens menu (marquee area)
     this.els.marqueeWrap.addEventListener('click', () => {
-      if (App.state.view === 'project') this.toggleLengueta();
+      if (App.state.view === 'project' && !this.lenguetaOpen) this.toggleLengueta();
     });
   },
 
@@ -227,7 +227,8 @@ const Footer = {
       const savedHTML = this._marqueeHTML;
       this._marqueeHTML = null;
       this.els.marqueeWrap.style.opacity = '0';
-      setTimeout(() => {
+      this._restoreMarqueeTimer = setTimeout(() => {
+        this._restoreMarqueeTimer = null;
         this.els.marqueeWrap.innerHTML = savedHTML;
         this.els.marqueeWrap.style.opacity = '';
         // Re-acquire marquee reference since innerHTML replaced it
@@ -248,6 +249,22 @@ const Footer = {
 
   showProject(name, fecha) {
     document.body.classList.add('view-project');
+
+    // Cancel any pending marquee restore from closeLengueta
+    if (this._restoreMarqueeTimer) {
+      clearTimeout(this._restoreMarqueeTimer);
+      this._restoreMarqueeTimer = null;
+      this.els.marqueeWrap.style.opacity = '';
+    }
+
+    // Re-acquire marquee reference (may have been replaced by menu bar)
+    const marquee = document.getElementById('marquee-text');
+    if (!marquee) {
+      // Menu bar is showing — restore marquee structure first
+      this.els.marqueeWrap.innerHTML = '<div class="footer__marquee-inner" id="marquee-text"></div>';
+      this.els.marquee = document.getElementById('marquee-text');
+    }
+
     const isPersonal = App.state.mode === 'personal';
     const label = isPersonal ? (fecha || name) : name;
     let spans = '';
