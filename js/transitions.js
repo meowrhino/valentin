@@ -69,6 +69,16 @@ const Transitions = {
     const grid = this.gridEl;
     const cells = this.cells;
 
+    // Start preloading image immediately (runs in parallel with blackout)
+    const targetImg = new Image();
+    targetImg.src = newFirstImageSrc;
+    const imgReady = new Promise(r => {
+      if (targetImg.complete) return r();
+      targetImg.onload = r;
+      targetImg.onerror = r;
+      setTimeout(r, 3000);
+    });
+
     // Show grid
     grid.classList.add('active');
 
@@ -79,15 +89,8 @@ const Transitions = {
       cell.style.background = '#000';
     }, GRID_STAGGER_MS);
 
-    // Small pause at full black
-    await new Promise(r => setTimeout(r, GRID_PAUSE_MS));
-
     // Execute callback while screen is fully black (update strip content)
     if (onBlackout) onBlackout();
-
-    // Preload the target image so strip has it ready
-    const targetImg = new Image();
-    targetImg.src = newFirstImageSrc;
 
     // Trigger first strip image load
     const stripImgs = document.querySelectorAll('#strip img[data-src]');
@@ -96,13 +99,9 @@ const Transitions = {
       firstStripImg.src = firstStripImg.dataset.src;
     }
 
-    // Wait for target image to load
-    await new Promise(r => {
-      if (targetImg.complete) return r();
-      targetImg.onload = r;
-      targetImg.onerror = r;
-      setTimeout(r, 3000);
-    });
+    // Wait for preloaded image + minimum pause (whichever is longer)
+    const minPause = new Promise(r => setTimeout(r, GRID_PAUSE_MS));
+    await Promise.all([imgReady, minPause]);
 
     // Wait for first strip image to be ready too
     if (firstStripImg && !firstStripImg.complete) {

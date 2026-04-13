@@ -18,7 +18,7 @@ const GRID_STAGGER_MS   = 12;    // delay between each grid cell (blackout)
 const GRID_REVEAL_STAGGER_MS = 20; // delay between each grid cell (reveal — slower)
 const GRID_CELL_FADE_MS = 150;   // individual cell opacity transition (blackout)
 const GRID_REVEAL_FADE_MS = 300; // individual cell opacity transition (reveal — smoother)
-const GRID_PAUSE_MS     = 200;   // pause at full black before loading
+const GRID_PAUSE_MS     = 400;   // minimum pause at full black (image loads in parallel)
 const GRID_CLEANUP_MS   = 200;   // pause before cleanup after reveal
 
 const Utils = {
