@@ -2,7 +2,9 @@
    App — main orchestrator, state, routing
    ============================================ */
 
-const BASE = new URL(document.baseURI).pathname; // '/valentin/' on GH Pages
+// Detect base path dynamically from script location:
+// '/valentin/' on GH Pages, '/' on local dev
+const BASE = new URL('..', document.currentScript.src).pathname;
 
 const App = {
 
@@ -19,7 +21,7 @@ const App = {
   async init() {
     // Fetch data
     try {
-      const res = await fetch('data.json');
+      const res = await fetch(BASE + 'data.json');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       this.state.data = await res.json();
     } catch (err) {
@@ -44,6 +46,16 @@ const App = {
 
     // About handler
     Footer.onAbout(() => this.enterAbout());
+
+    // Toggle cover/contain with C key (for testing)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'c' || e.key === 'C') {
+        Utils.fitMode = Utils.fitMode === 'cover' ? 'contain' : 'cover';
+        console.log('Fit mode:', Utils.fitMode);
+        Home._resizeAll();
+        Project._resizeAll();
+      }
+    });
 
     // Handle clean URL routing
     this._handleRoute();
@@ -127,6 +139,10 @@ const App = {
 
     const firstImgSrc = Utils.imgPath(about.slug, 1, about.imgExt);
     const savedAboutPos = this.state.aboutSlidePos;
+
+    // Switch footer before grid so crossfade is visible during transition
+    Footer.showProject(about.nombre, about.fecha);
+
     await Transitions.gridTransition(firstImgSrc, () => {
       this.state.currentProjectIndex = -1; // special: about
       Project.open(about, null);
@@ -137,7 +153,6 @@ const App = {
       this._ensureMirillaOpen();
     });
 
-    Footer.showProject(about.nombre, about.fecha);
     history.pushState(null, '', `${BASE}about`);
     this.state.view = 'project';
   },
@@ -209,11 +224,11 @@ const App = {
       const firstProject = this.state.projects[0];
       const firstImgSrc = Utils.imgPath(firstProject.slug, 1, firstProject.imgExt);
       AudioPlayer.stopAll();
+      Footer.showProject(firstProject.nombre, firstProject.fecha);
       await Transitions.gridTransition(firstImgSrc, () => {
         this.state.currentProjectIndex = 0;
         Project.open(firstProject, null);
       });
-      Footer.showProject(firstProject.nombre, firstProject.fecha);
       history.pushState(null, '', `${BASE}project/${firstProject.slug}`);
       this.state.view = 'project';
       return;
@@ -226,14 +241,14 @@ const App = {
     // Stop current audio
     AudioPlayer.stopAll();
 
+    // Switch footer before grid so crossfade is visible during transition
+    Footer.showProject(nextProject.nombre, nextProject.fecha);
+
     // Run 8x8 grid transition — update strip while screen is black
     await Transitions.gridTransition(firstImgSrc, () => {
       this.state.currentProjectIndex = nextIdx;
       Project.open(nextProject, null);
     });
-
-    // Update footer marquee text
-    Footer.showProject(nextProject.nombre, nextProject.fecha);
 
     // Update URL
     history.pushState(null, '', `${BASE}project/${nextProject.slug}`);

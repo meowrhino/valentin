@@ -4,10 +4,17 @@
   <meta charset="UTF-8">
   <script>
     // Clean URL routing for static hosting (GitHub Pages, etc.)
-    // Redirects /project/slug to index.html with the path preserved
-    const base = '/valentin/';
+    // Detects base path dynamically from URL structure
+    const segments = window.location.pathname.split('/');
+    const routeIdx = segments.indexOf('project') !== -1
+      ? segments.indexOf('project')
+      : segments.indexOf('about') !== -1
+        ? segments.indexOf('about')
+        : -1;
+    const base = routeIdx > 0
+      ? '/' + segments.slice(1, routeIdx).join('/') + '/'
+      : '/';
     const path = window.location.pathname;
-    // Strip base prefix before storing route
     const route = path.startsWith(base) ? '/' + path.slice(base.length) : path;
     sessionStorage.setItem('route', route);
     window.location.replace(base);

@@ -27,7 +27,7 @@ const Transitions = {
   openMirilla() {
     return new Promise(resolve => {
       this.mirilla.classList.add('mirilla--open');
-      setTimeout(resolve, 600);
+      setTimeout(resolve, TRANSITION_MS);
     });
   },
 
@@ -35,7 +35,7 @@ const Transitions = {
   closeMirilla() {
     return new Promise(resolve => {
       this.mirilla.classList.remove('mirilla--open');
-      setTimeout(resolve, 600);
+      setTimeout(resolve, TRANSITION_MS);
     });
   },
 
@@ -44,7 +44,7 @@ const Transitions = {
     this.mirilla.classList.add('mirilla--open');
 
     // Wait for at least the minimum animation time
-    const minWait = new Promise(r => setTimeout(r, 600));
+    const minWait = new Promise(r => setTimeout(r, TRANSITION_MS));
 
     // Wait for images to load
     const imgWait = Promise.all(
@@ -78,10 +78,10 @@ const Transitions = {
       cell.style.opacity = '1';
       cell.style.backgroundImage = 'none';
       cell.style.background = '#000';
-    }, 20);
+    }, GRID_STAGGER_MS);
 
     // Small pause at full black
-    await new Promise(r => setTimeout(r, 200));
+    await new Promise(r => setTimeout(r, GRID_PAUSE_MS));
 
     // Preload the target image (start early, before onBlackout)
     const targetImg = new Image();
@@ -152,10 +152,10 @@ const Transitions = {
     const order2 = Utils.shuffle(Utils.range(64));
     await this._staggerCells(order2, cell => {
       cell.style.opacity = '0';
-    }, 20);
+    }, GRID_STAGGER_MS);
 
     // Clean up — disable transitions before hiding to prevent ghost flicker
-    await new Promise(r => setTimeout(r, 200));
+    await new Promise(r => setTimeout(r, GRID_CLEANUP_MS));
     cells.forEach(cell => {
       cell.style.transition = 'none';
       cell.style.opacity = '0';
@@ -178,7 +178,7 @@ const Transitions = {
         setTimeout(() => {
           action(this.cells[idx]);
           if (step === order.length - 1) {
-            setTimeout(resolve, 150); // wait for last transition
+            setTimeout(resolve, GRID_CELL_FADE_MS); // wait for last transition
           }
         }, step * delayMs);
       });

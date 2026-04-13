@@ -5,8 +5,8 @@
   "about": {
     "slug": "_valentin",
     "nombre": "Valentin Barrio",
-    "imgExt": "png",
-    "imgCountArchive": 3,
+    "imgExt": "webp",
+    "imgCountArchive": 11,
     "fotosHome": [
       1
     ],
@@ -25,12 +25,32 @@
         "src": 1
       },
       {
+        "tipo": "imagen",
+        "src": 2
+      },
+      {
         "tipo": "texto",
         "contenido": "Every frame is a conversation between what happened and what I chose to see."
       },
       {
         "tipo": "imagen",
-        "src": 2
+        "src": 3
+      },
+      {
+        "tipo": "imagen",
+        "src": 4
+      },
+      {
+        "tipo": "audio",
+        "src": "WhatsApp Audio 2026-04-09 at 11.23.28.opus"
+      },
+      {
+        "tipo": "imagen",
+        "src": 5
+      },
+      {
+        "tipo": "imagen",
+        "src": 6
       },
       {
         "tipo": "texto",
@@ -38,7 +58,27 @@
       },
       {
         "tipo": "imagen",
-        "src": 3
+        "src": 7
+      },
+      {
+        "tipo": "imagen",
+        "src": 8
+      },
+      {
+        "tipo": "imagen",
+        "src": 9
+      },
+      {
+        "tipo": "texto",
+        "contenido": "The silence between two frames is where the real story lives."
+      },
+      {
+        "tipo": "imagen",
+        "src": 10
+      },
+      {
+        "tipo": "imagen",
+        "src": 11
       }
     ]
   },
@@ -53,27 +93,17 @@
         5
       ],
       "fichaTecnica": [
-        "Photography",
-        "Art Direction"
+        "press"
       ],
-      "lugar": "Montserrat",
+      "lugar": "Barcelona",
       "descripcion": "Editorial shoot exploring contrast between urban attitude and raw natural landscapes.",
-      "fecha": "Autumn 2024",
-      "team": [
-        [
-          "Styling",
-          ""
-        ],
-        [
-          "Models",
-          ""
-        ]
-      ],
+      "fecha": "jan. 26",
+      "team": [],
       "contenido": null
     },
     {
       "slug": "brunch",
-      "nombre": "Brunch",
+      "nombre": "Brunch!",
       "imgCountArchive": 81,
       "fotosHome": [
         1,
@@ -81,18 +111,12 @@
         25
       ],
       "fichaTecnica": [
-        "Event Photography",
-        "Live Coverage"
+        "festival"
       ],
       "lugar": "Barcelona",
       "descripcion": "Full documentation of the Brunch electronic music series. Light, smoke, and movement.",
-      "fecha": "Summer 2023",
-      "team": [
-        [
-          "Brunch BCN",
-          "https://instagram.com/brunchbcn"
-        ]
-      ],
+      "fecha": "august 25",
+      "team": [],
       "contenido": null
     },
     {
@@ -105,18 +129,12 @@
         5
       ],
       "fichaTecnica": [
-        "Portrait",
-        "Fashion"
+        "press"
       ],
       "lugar": "Barcelona",
       "descripcion": "Intimate portrait series. Natural light, minimal intervention.",
-      "fecha": "Spring 2024",
-      "team": [
-        [
-          "Kala Ros",
-          ""
-        ]
-      ],
+      "fecha": "dec 25",
+      "team": [],
       "contenido": null
     },
     {
@@ -129,23 +147,17 @@
         7
       ],
       "fichaTecnica": [
-        "Fashion",
-        "Editorial"
+        "club"
       ],
       "lugar": "Barcelona",
       "descripcion": "Dark editorial for Kult magazine. Textures, shadows, and bold silhouettes.",
-      "fecha": "Winter 2024",
-      "team": [
-        [
-          "Kult Magazine",
-          ""
-        ]
-      ],
+      "fecha": "dec. 25",
+      "team": [],
       "contenido": null
     },
     {
       "slug": "lucho",
-      "nombre": "Lucho",
+      "nombre": "Lucho (Ve)",
       "imgCountArchive": 12,
       "fotosHome": [
         1,
@@ -153,18 +165,12 @@
         9
       ],
       "fichaTecnica": [
-        "Portrait",
-        "Music"
+        "press"
       ],
-      "lugar": "Barcelona",
+      "lugar": "Reflejo 44",
       "descripcion": "Artist portrait series. Capturing the personality behind the sound.",
-      "fecha": "Autumn 2023",
-      "team": [
-        [
-          "Lucho",
-          ""
-        ]
-      ],
+      "fecha": "feb. 26",
+      "team": [],
       "contenido": null
     },
     {
@@ -177,15 +183,14 @@
         7
       ],
       "fichaTecnica": [
-        "Portrait",
-        "Natural Light"
+        "press"
       ],
-      "lugar": "Barcelona",
+      "lugar": "Mallorca",
       "descripcion": "Golden hour portrait session. Warmth and authenticity.",
-      "fecha": "Summer 2024",
+      "fecha": "oct. 25",
       "team": [
         [
-          "Lynn",
+          "Rivka (photo assist & 2nd camera)",
           ""
         ]
       ],
@@ -201,18 +206,12 @@
         13
       ],
       "fichaTecnica": [
-        "Event Photography",
-        "Nightlife"
+        "club"
       ],
       "lugar": "Barcelona",
       "descripcion": "Razzmatazz nights. The energy of the crowd under neon and strobe.",
-      "fecha": "Winter 2023",
-      "team": [
-        [
-          "Razzmatazz",
-          "https://instagram.com/raborazz"
-        ]
-      ],
+      "fecha": "feb. 25",
+      "team": [],
       "contenido": null
     },
     {
@@ -225,42 +224,28 @@
         7
       ],
       "fichaTecnica": [
-        "Portrait",
-        "Editorial"
+        "club"
       ],
       "lugar": "Barcelona",
       "descripcion": "Character study in urban environments. Street meets studio.",
-      "fecha": "Spring 2023",
-      "team": [
-        [
-          "Santana",
-          ""
-        ]
-      ],
+      "fecha": "feb. 26",
+      "team": [],
       "contenido": null
     },
     {
       "slug": "soundit",
-      "nombre": "Soundit",
+      "nombre": "Sound it!",
       "imgCountArchive": 71,
       "fotosHome": [
         1,
         20,
         40
       ],
-      "fichaTecnica": [
-        "Festival Photography",
-        "Live Coverage"
-      ],
+      "fichaTecnica": [],
       "lugar": "Barcelona",
       "descripcion": "Complete visual chronicle of Soundit festival. From backstage to main stage.",
-      "fecha": "Summer 2024",
-      "team": [
-        [
-          "Soundit Festival",
-          ""
-        ]
-      ],
+      "fecha": "august 25",
+      "team": [],
       "contenido": null
     },
     {
@@ -273,15 +258,57 @@
         12
       ],
       "fichaTecnica": [
-        "Fashion",
-        "Portrait"
+        "club"
       ],
       "lugar": "Barcelona",
       "descripcion": "Fashion editorial blending Eastern and Western aesthetics.",
-      "fecha": "Autumn 2024",
+      "fecha": "dec. 25",
+      "team": [],
+      "contenido": null
+    },
+    {
+      "slug": "carlos",
+      "nombre": "Carlos",
+      "imgCountArchive": 21,
+      "fotosHome": [
+        1,
+        8,
+        15
+      ],
+      "fichaTecnica": [
+        "Portrait",
+        "Editorial"
+      ],
+      "lugar": "Barcelona",
+      "descripcion": "Portrait editorial with Carlos. Character, attitude, and natural expression.",
+      "fecha": "Spring 2025",
       "team": [
         [
-          "Yu",
+          "Carlos",
+          ""
+        ]
+      ],
+      "contenido": null
+    },
+    {
+      "slug": "heyami",
+      "nombre": "Hey Ami",
+      "imgCountArchive": 9,
+      "fotosHome": [
+        1,
+        4,
+        7
+      ],
+      "fichaTecnica": [
+        "Photography",
+        "Creative Direction"
+      ],
+      "lugar": "Barcelona",
+      "descripcion": "Creative direction and photography for Hey Ami. Bold visuals and identity.",
+      "fecha": "Winter 2025",
+      "team": [
+        [
+          "Hey Ami",
           ""
         ]
       ],

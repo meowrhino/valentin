@@ -29,7 +29,7 @@ const Footer = {
     const isPersonal = App.state.mode === 'personal';
     this.els.projectName.textContent = isPersonal ? (fecha || name) : name;
     // Update left side name for personal mode
-    this.els.aboutBtn.textContent = isPersonal ? 'valentín' : 'valentin barrio';
+    this.els.aboutBtn.innerHTML = isPersonal ? 'valentín' : 'valentín<span class="about-surname"> barrio</span>';
     // Close lengüeta when project changes
     this.closeLengueta();
   },
@@ -85,7 +85,9 @@ const Footer = {
 
     this.els.lenguetaContent.innerHTML = html;
     this.els.lengueta.classList.add('lengueta--open');
-    this.els.projectName.style.opacity = '0';
+    this._savedProjectName = this.els.projectName.textContent;
+    this.els.projectName.textContent = '✕';
+    this.els.projectName.classList.add('footer__close');
     this.lenguetaOpen = true;
 
     // Event delegation — single listener on container (no leak on rebuild)
@@ -117,7 +119,10 @@ const Footer = {
 
   closeLengueta() {
     this.els.lengueta.classList.remove('lengueta--open');
-    this.els.projectName.style.opacity = '';
+    if (this._savedProjectName) {
+      this.els.projectName.textContent = this._savedProjectName;
+    }
+    this.els.projectName.classList.remove('footer__close');
     this.lenguetaOpen = false;
     if (this._closeLenguetaHandler) {
       document.removeEventListener('click', this._closeLenguetaHandler);

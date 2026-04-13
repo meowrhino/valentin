@@ -57,7 +57,7 @@ const Project = {
       } else if (item.tipo === 'texto') {
         this._addTextSlide(item.contenido);
       } else if (item.tipo === 'audio') {
-        this._addAudioSlide(`_PROJECTS/${project.slug}/${item.src}`);
+        this._addAudioSlide(`${BASE}_PROJECTS/${project.slug}/${item.src}`);
       }
     });
     this._addFichaTecnicaSlide(project);
@@ -168,6 +168,15 @@ const Project = {
     }
 
     Utils.lazyWindow(this.slides, index, LAZY_RADIUS);
+  },
+
+  _resizeAll() {
+    this.slides.forEach(slide => {
+      const img = slide.querySelector('img');
+      if (img && img.naturalWidth) {
+        Utils.sizeImage(img, slide);
+      }
+    });
   },
 
   close() {

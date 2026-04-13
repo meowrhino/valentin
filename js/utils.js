@@ -10,11 +10,22 @@ const TOUCH_MIN_SWIPE = 40;
 const LAZY_RADIUS = 3;
 const SLIDE_TRANSITION = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
 
+// --- Transition timing (centralized) ---
+// Change these to adjust all animation speeds globally.
+// CSS var --transition-speed in style.css must match TRANSITION_MS.
+const TRANSITION_MS     = 800;   // mirilla slide + footer crossfade
+const GRID_STAGGER_MS   = 12;    // delay between each grid cell
+const GRID_CELL_FADE_MS = 150;   // individual cell opacity transition
+const GRID_PAUSE_MS     = 200;   // pause at full black before loading
+const GRID_CLEANUP_MS   = 200;   // pause before cleanup after reveal
+
 const Utils = {
+
+  fitMode: 'cover',  // 'cover' or 'contain' — toggle with C key
 
   // Build image path for a project
   imgPath(slug, num, ext) {
-    return `_PROJECTS/${slug}/${num}.${ext || 'webp'}`;
+    return `${BASE}_PROJECTS/${slug}/${num}.${ext || 'webp'}`;
   },
 
   // Detect if image is "more horizontal" than the container
@@ -24,19 +35,30 @@ const Utils = {
     return imgRatio > containerRatio;
   },
 
-  // Size an image to fill the container (cover behavior via JS for drag-to-pan support)
+  // Size an image to fill (cover) or fit (contain) the container
   sizeImage(img, container) {
     const cw = container.offsetWidth;
     const ch = container.offsetHeight;
+    const landscape = Utils.isLandscape(img, container);
 
-    if (Utils.isLandscape(img, container)) {
-      // Image is wider than container ratio — fill height, overflow width
-      img.style.height = ch + 'px';
-      img.style.width = 'auto';
+    if (Utils.fitMode === 'contain') {
+      // Contain: full image visible, may have bands
+      if (landscape) {
+        img.style.width = cw + 'px';
+        img.style.height = 'auto';
+      } else {
+        img.style.height = ch + 'px';
+        img.style.width = 'auto';
+      }
     } else {
-      // Image is taller than container ratio — fill width, overflow height
-      img.style.width = cw + 'px';
-      img.style.height = 'auto';
+      // Cover: fill container, crop overflow
+      if (landscape) {
+        img.style.height = ch + 'px';
+        img.style.width = 'auto';
+      } else {
+        img.style.width = cw + 'px';
+        img.style.height = 'auto';
+      }
     }
   },
 
