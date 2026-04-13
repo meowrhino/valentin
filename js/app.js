@@ -39,7 +39,6 @@ const App = {
     Footer.init();
     Footer.updateSwitchIcon(this.state.mode);
     Transitions.init();
-    Utils.fitMode = this._homeFitMode();
     Home.init(this.state.projects);
     Project.bindScroll();
 
@@ -79,7 +78,6 @@ const App = {
         // Direct entry — no transition, just show project immediately
         this.state.currentProjectIndex = idx;
         const project = this.state.projects[idx];
-        Utils.fitMode = 'contain';
         Project.open(project, null);
         Footer.showProject(project.nombre, project.fecha);
         this.state.view = 'project';
@@ -112,19 +110,15 @@ const App = {
     // Save current mode position before switching
     this.state.savedPositions[this.state.mode] = Home.getPosition();
 
-    const homeFit = this._homeFitMode();
     await Transitions.gridTransition(firstImgSrc, () => {
-
-      Utils.fitMode = homeFit;
       this.state.mode = newMode;
       this.state.allProjects = newProjects;
       this.state.projects = newProjects;
       this.state.typeFilter = 'all';
       Home.init(this.state.projects);
-      // Restore saved position for the new mode
       Home.setPosition(this.state.savedPositions[newMode]);
       Footer.updateSwitchIcon(newMode);
-    }, homeFit);
+    });
 
     history.pushState(null, '', BASE);
     this.state.view = 'home';
@@ -146,14 +140,12 @@ const App = {
     Footer.showProject('Valentin Barrio', '');
 
     await Transitions.gridTransition(firstImgSrc, () => {
-      Utils.fitMode = 'contain';
       this.state.currentProjectIndex = -1; // special: about
       Project.open(about, null);
-      // Restore saved about position
       if (savedAboutPos > 0) {
         Project._goTo(savedAboutPos, false);
       }
-    }, 'contain');
+    });
 
     history.pushState(null, '', `${BASE}about`);
     this.state.view = 'project';
@@ -179,9 +171,8 @@ const App = {
 
     const firstImgSrc = Utils.imgPath(project.slug, startPhotoNum || 1, project.imgExt);
     await Transitions.gridTransition(firstImgSrc, () => {
-      Utils.fitMode = 'contain';
       Project.open(project, startPhotoNum);
-    }, 'contain');
+    });
 
     this.state.view = 'project';
   },
@@ -201,15 +192,13 @@ const App = {
     // Switch footer back with crossfade
     Footer.showHome();
 
-    const homeFit = this._homeFitMode();
     const currentProject = this.state.projects[0];
     const firstImgSrc = Utils.imgPath(currentProject.slug, currentProject.fotosHome[0], currentProject.imgExt);
     await Transitions.gridTransition(firstImgSrc, () => {
-      Utils.fitMode = homeFit;
       Project.close();
       Home.show();
       Home.setPosition(this.state.savedPositions[this.state.mode]);
-    }, homeFit);
+    });
 
     // Update URL
     history.pushState(null, '', BASE);
@@ -229,10 +218,9 @@ const App = {
       AudioPlayer.stopAll();
       Footer.showProject(firstProject.nombre, firstProject.fecha);
       await Transitions.gridTransition(firstImgSrc, () => {
-        Utils.fitMode = 'contain';
         this.state.currentProjectIndex = 0;
         Project.open(firstProject, null);
-      }, 'contain');
+      });
       history.pushState(null, '', `${BASE}project/${firstProject.slug}`);
       this.state.view = 'project';
       return;
@@ -250,10 +238,9 @@ const App = {
 
     // Run 8x8 grid transition — update strip while screen is black
     await Transitions.gridTransition(firstImgSrc, () => {
-      Utils.fitMode = 'contain';
       this.state.currentProjectIndex = nextIdx;
       Project.open(nextProject, null);
-    }, 'contain');
+    });
 
     // Update URL
     history.pushState(null, '', `${BASE}project/${nextProject.slug}`);
@@ -275,10 +262,9 @@ const App = {
     Footer.showProject(prevProject.nombre, prevProject.fecha);
 
     await Transitions.gridTransition(firstImgSrc, () => {
-      Utils.fitMode = 'contain';
       this.state.currentProjectIndex = prevIdx;
       Project.open(prevProject, null);
-    }, 'contain');
+    });
 
     history.pushState(null, '', `${BASE}project/${prevProject.slug}`);
     this.state.view = 'project';
@@ -297,10 +283,9 @@ const App = {
     Footer.showProject(project.nombre, project.fecha);
 
     await Transitions.gridTransition(firstImgSrc, () => {
-      Utils.fitMode = 'contain';
       this.state.currentProjectIndex = projectIndex;
       Project.open(project, null);
-    }, 'contain');
+    });
 
     history.pushState(null, '', `${BASE}project/${project.slug}`);
     this.state.view = 'project';
@@ -332,19 +317,12 @@ const App = {
 
     this.state.savedPositions[this.state.mode] = Home.getPosition();
 
-    const homeFit = this._homeFitMode();
     await Transitions.gridTransition(firstImgSrc, () => {
-      Utils.fitMode = homeFit;
       Home.init(this.state.projects);
-    }, homeFit);
+    });
 
     history.pushState(null, '', BASE);
     this.state.view = 'home';
-  },
-
-  // Home fitMode: contain on mobile, cover on desktop
-  _homeFitMode() {
-    return window.innerWidth <= 768 ? 'contain' : 'cover';
   },
 
   // Sort projects by type, preserving first-appearance order of types in the array

@@ -21,44 +21,22 @@ const GRID_CLEANUP_MS   = 200;   // pause before cleanup after reveal
 
 const Utils = {
 
-  fitMode: 'cover',  // 'cover' or 'contain' — toggle with C key
-
   // Build image path for a project
   imgPath(slug, num, ext) {
     return `${BASE}_PROJECTS/${slug}/${num}.${ext || 'webp'}`;
   },
 
-  // Detect if image is "more horizontal" than the container
-  isLandscape(img, container) {
+  // Size an image to fit (contain) the container
+  sizeImage(img, container) {
     const imgRatio = img.naturalWidth / img.naturalHeight;
     const containerRatio = container.offsetWidth / container.offsetHeight;
-    return imgRatio > containerRatio;
-  },
 
-  // Size an image to fill (cover) or fit (contain) the container
-  sizeImage(img, container) {
-    const cw = container.offsetWidth;
-    const ch = container.offsetHeight;
-    const landscape = Utils.isLandscape(img, container);
-
-    if (Utils.fitMode === 'contain') {
-      // Contain: full image visible, may have bands
-      if (landscape) {
-        img.style.width = cw + 'px';
-        img.style.height = 'auto';
-      } else {
-        img.style.height = ch + 'px';
-        img.style.width = 'auto';
-      }
+    if (imgRatio > containerRatio) {
+      img.style.width = container.offsetWidth + 'px';
+      img.style.height = 'auto';
     } else {
-      // Cover: fill container, crop overflow
-      if (landscape) {
-        img.style.height = ch + 'px';
-        img.style.width = 'auto';
-      } else {
-        img.style.width = cw + 'px';
-        img.style.height = 'auto';
-      }
+      img.style.height = container.offsetHeight + 'px';
+      img.style.width = 'auto';
     }
   },
 

@@ -22,7 +22,7 @@ const Transitions = {
   // --- 8x8 Grid Transition ---
 
   // Run the full blackout → reveal transition
-  async gridTransition(newFirstImageSrc, onBlackout, fitMode) {
+  async gridTransition(newFirstImageSrc, onBlackout) {
     const grid = this.gridEl;
     const cells = this.cells;
 
