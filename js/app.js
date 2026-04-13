@@ -144,7 +144,7 @@ const App = {
     const savedAboutPos = this.state.aboutSlidePos;
 
     // Switch footer before grid so crossfade is visible during transition
-    Footer.showProject(about.nombre, about.fecha);
+    Footer.showProject('Valentin Barrio', '');
 
     await Transitions.gridTransition(firstImgSrc, () => {
       Utils.fitMode = 'contain';

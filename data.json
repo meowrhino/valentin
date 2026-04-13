@@ -4,13 +4,10 @@
   },
   "about": {
     "slug": "_valentin",
-    "nombre": "Valentin Barrio",
-    "imgCountArchive": 11,
     "fotosHome": [1],
     "type": "Photography, Art Direction, Visual Storytelling",
     "lugar": "Barcelona",
     "descripcion": "Photographer and visual artist based in Barcelona. Focused on capturing the raw energy of live events, fashion editorials, and intimate portraits.",
-    "fecha": "",
     "contenido": [
       { "tipo": "imagen", "src": 1 },
       { "tipo": "imagen", "src": 2 },
