@@ -241,7 +241,9 @@
         20,
         40
       ],
-      "fichaTecnica": [],
+      "fichaTecnica": [
+        "festival"
+      ],
       "lugar": "Barcelona",
       "descripcion": "Complete visual chronicle of Soundit festival. From backstage to main stage.",
       "fecha": "august 25",
@@ -276,8 +278,7 @@
         15
       ],
       "fichaTecnica": [
-        "Portrait",
-        "Editorial"
+        "press"
       ],
       "lugar": "Barcelona",
       "descripcion": "Portrait editorial with Carlos. Character, attitude, and natural expression.",
@@ -300,8 +301,7 @@
         7
       ],
       "fichaTecnica": [
-        "Photography",
-        "Creative Direction"
+        "press"
       ],
       "lugar": "Barcelona",
       "descripcion": "Creative direction and photography for Hey Ami. Bold visuals and identity.",

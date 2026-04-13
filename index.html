@@ -2,6 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <script>
+    // Dynamic base for SPA routing: /valentin/ on GitHub Pages, / on local dev
+    (function() {
+      var b = document.createElement('base');
+      b.href = location.pathname.indexOf('/valentin') === 0 ? '/valentin/' : '/';
+      document.head.appendChild(b);
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>valentin barrio</title>
   <meta name="description" content="valentin barrio — photography portfolio">
