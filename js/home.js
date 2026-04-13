@@ -138,14 +138,23 @@ const Home = {
       else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') this.prev();
     });
 
-    // Click on slide → enter project
+    // Tap zones: left third = prev, right third = next, center = enter project
     this.strip.addEventListener('click', (e) => {
       if (App.state.view !== 'home') return;
       const slide = e.target.closest('.slide');
       if (!slide) return;
-      const pIdx = parseInt(slide.dataset.projectIndex);
-      const photoNum = parseInt(slide.dataset.photoNum);
-      App.enterProject(pIdx, photoNum);
+
+      const x = e.clientX;
+      const w = window.innerWidth;
+      if (x < w / 3) {
+        this.prev();
+      } else if (x > w * 2 / 3) {
+        this.next();
+      } else {
+        const pIdx = parseInt(slide.dataset.projectIndex);
+        const photoNum = parseInt(slide.dataset.photoNum);
+        App.enterProject(pIdx, photoNum);
+      }
     });
   },
 
