@@ -1,15 +1,13 @@
 /* ============================================
-   Transitions — mirilla open/close, 8x8 grid
+   Transitions — 8x8 grid
    ============================================ */
 
 const Transitions = {
 
-  mirilla: null,
   gridEl: null,
   cells: [],
 
   init() {
-    this.mirilla = document.getElementById('mirilla');
     this.gridEl = document.getElementById('grid-transition');
 
     // Pre-create 64 grid cells
@@ -19,47 +17,6 @@ const Transitions = {
       this.gridEl.appendChild(cell);
       this.cells.push(cell);
     }
-  },
-
-  // --- Mirilla ---
-
-  // Open mirilla (home → project): bars slide away
-  openMirilla() {
-    return new Promise(resolve => {
-      this.mirilla.classList.add('mirilla--open');
-      setTimeout(resolve, TRANSITION_MS);
-    });
-  },
-
-  // Close mirilla (project → home): bars slide back
-  closeMirilla() {
-    return new Promise(resolve => {
-      this.mirilla.classList.remove('mirilla--open');
-      setTimeout(resolve, TRANSITION_MS);
-    });
-  },
-
-  // Extend mirilla animation until images are ready
-  async openMirillaWithLoading(imagesToWait) {
-    this.mirilla.classList.add('mirilla--open');
-
-    // Wait for at least the minimum animation time
-    const minWait = new Promise(r => setTimeout(r, TRANSITION_MS));
-
-    // Wait for images to load
-    const imgWait = Promise.all(
-      imagesToWait.map(img => {
-        if (img.complete && img.naturalWidth) return Promise.resolve();
-        return new Promise(r => {
-          img.addEventListener('load', r, { once: true });
-          img.addEventListener('error', r, { once: true });
-          // Timeout fallback
-          setTimeout(r, 3000);
-        });
-      })
-    );
-
-    await Promise.all([minWait, imgWait]);
   },
 
   // --- 8x8 Grid Transition ---

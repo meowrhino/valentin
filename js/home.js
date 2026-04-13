@@ -1,5 +1,5 @@
 /* ============================================
-   Home — horizontal strip with mirilla
+   Home — horizontal strip with infinite loop
    Infinite loop via clone technique
    ============================================ */
 

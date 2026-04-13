@@ -34,8 +34,7 @@ html, body {
 
 :root {
   --footer-h: 48px;
-  --mirilla-size: 15%;
-  --transition-speed: 0.8s; /* must match TRANSITION_MS in utils.js */
+  --transition-speed: 0.8s;
 }
 
 /* --- Viewer (everything above footer) --- */
@@ -168,46 +167,9 @@ html, body {
   opacity: 1;
 }
 
-/* --- Mirilla (peephole overlays) --- */
+/* --- Mobile overrides --- */
 
-.mirilla {
-  position: fixed;
-  background: #000;
-  z-index: 50;
-  pointer-events: none;
-  transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.mirilla--top {
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--mirilla-size);
-}
-
-.mirilla--bottom {
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: calc(var(--mirilla-size) + var(--footer-h));
-}
-
-/* When mirilla is open (project view) */
-.mirilla--open .mirilla--top {
-  transform: translateY(-100%);
-}
-
-.mirilla--open .mirilla--bottom {
-  transform: translateY(100%);
-}
-
-/* Mobile: left/right instead of top/bottom */
 @media (max-width: 768px) {
-  .mirilla--top,
-  .mirilla--bottom {
-    display: none;
-  }
-
   .about-surname {
     display: none;
   }

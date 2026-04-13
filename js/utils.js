@@ -12,8 +12,6 @@ const SLIDE_TRANSITION = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
 
 // --- Transition timing (centralized) ---
 // Change these to adjust all animation speeds globally.
-// CSS var --transition-speed in style.css must match TRANSITION_MS.
-const TRANSITION_MS     = 800;   // mirilla slide + footer crossfade
 const GRID_STAGGER_MS   = 12;    // delay between each grid cell (blackout)
 const GRID_REVEAL_STAGGER_MS = 20; // delay between each grid cell (reveal — slower)
 const GRID_CELL_FADE_MS = 150;   // individual cell opacity transition (blackout)

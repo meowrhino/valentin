@@ -82,7 +82,6 @@ const App = {
         Utils.fitMode = 'contain';
         Project.open(project, null);
         Footer.showProject(project.nombre, project.fecha);
-        this._ensureMirillaOpen();
         this.state.view = 'project';
       }
     }
@@ -154,7 +153,6 @@ const App = {
       if (savedAboutPos > 0) {
         Project._goTo(savedAboutPos, false);
       }
-      this._ensureMirillaOpen();
     }, 'contain');
 
     history.pushState(null, '', `${BASE}about`);
@@ -179,20 +177,11 @@ const App = {
     // Switch footer with crossfade
     Footer.showProject(project.nombre, project.fecha);
 
-    // Mobile: use grid transition; Desktop: use mirilla
-    const isMobile = window.innerWidth <= 768;
-    if (isMobile) {
-      const firstImgSrc = Utils.imgPath(project.slug, startPhotoNum || 1, project.imgExt);
-      await Transitions.gridTransition(firstImgSrc, () => {
-        Utils.fitMode = 'contain';
-        Project.open(project, startPhotoNum);
-      }, 'contain');
-    } else {
+    const firstImgSrc = Utils.imgPath(project.slug, startPhotoNum || 1, project.imgExt);
+    await Transitions.gridTransition(firstImgSrc, () => {
       Utils.fitMode = 'contain';
       Project.open(project, startPhotoNum);
-      const firstImages = this._getFirstStripImages(3);
-      await Transitions.openMirillaWithLoading(firstImages);
-    }
+    }, 'contain');
 
     this.state.view = 'project';
   },
@@ -212,27 +201,15 @@ const App = {
     // Switch footer back with crossfade
     Footer.showHome();
 
-    const isMobile = window.innerWidth <= 768;
     const homeFit = this._homeFitMode();
-
-    if (isMobile) {
-      // Mobile: use grid transition to go back to home
-      const currentProject = this.state.projects[0]; // first project for grid image
-      const firstImgSrc = Utils.imgPath(currentProject.slug, currentProject.fotosHome[0], currentProject.imgExt);
-      await Transitions.gridTransition(firstImgSrc, () => {
-        Utils.fitMode = homeFit;
-        Project.close();
-        Home.show();
-        Home.setPosition(this.state.savedPositions[this.state.mode]);
-      }, homeFit);
-    } else {
-      // Desktop: close mirilla
-      await Transitions.closeMirilla();
+    const currentProject = this.state.projects[0];
+    const firstImgSrc = Utils.imgPath(currentProject.slug, currentProject.fotosHome[0], currentProject.imgExt);
+    await Transitions.gridTransition(firstImgSrc, () => {
       Utils.fitMode = homeFit;
       Project.close();
       Home.show();
       Home.setPosition(this.state.savedPositions[this.state.mode]);
-    }
+    }, homeFit);
 
     // Update URL
     history.pushState(null, '', BASE);
@@ -370,14 +347,6 @@ const App = {
     return window.innerWidth <= 768 ? 'contain' : 'cover';
   },
 
-  // Instantly set mirilla to open state (no animation)
-  _ensureMirillaOpen() {
-    const m = document.getElementById('mirilla');
-    m.style.transition = 'none';
-    m.classList.add('mirilla--open');
-    requestAnimationFrame(() => { m.style.transition = ''; });
-  },
-
   // Sort projects by type, preserving first-appearance order of types in the array
   _sortByType(projects) {
     if (!projects || !projects.length) return projects;
@@ -394,21 +363,6 @@ const App = {
       return typeOrder.indexOf(typeA) - typeOrder.indexOf(typeB);
     });
   },
-
-  // Helper: get first N img elements from the current strip
-  _getFirstStripImages(n) {
-    const strip = document.getElementById('strip');
-    const imgs = strip.querySelectorAll('img[data-src]');
-    const result = [];
-    for (let i = 0; i < Math.min(n, imgs.length); i++) {
-      // Trigger load by setting src
-      if (imgs[i].dataset.src && !imgs[i].src) {
-        imgs[i].src = imgs[i].dataset.src;
-      }
-      result.push(imgs[i]);
-    }
-    return result;
-  }
 };
 
 // Handle browser back/forward
