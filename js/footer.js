@@ -65,7 +65,7 @@ const Footer = {
   _groupByType(projects) {
     const groups = {};
     projects.forEach((p, idx) => {
-      const type = (p.fichaTecnica && p.fichaTecnica[0]) ? p.fichaTecnica[0].toLowerCase() : 'other';
+      const type = p.type ? p.type.toLowerCase() : 'other';
       if (!groups[type]) groups[type] = [];
       groups[type].push({ project: p, index: idx });
     });

@@ -123,9 +123,9 @@ const Project = {
       p.innerHTML = `<span class="ficha-label">Date</span> ${project.fecha}`;
       container.appendChild(p);
     }
-    if (project.fichaTecnica && project.fichaTecnica.length) {
+    if (project.type) {
       const p = document.createElement('p');
-      p.innerHTML = `<span class="ficha-label">Type</span> ${project.fichaTecnica.join(', ')}`;
+      p.innerHTML = `<span class="ficha-label">Type</span> ${project.type}`;
       container.appendChild(p);
     }
     if (project.team && project.team.length) {

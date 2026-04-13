@@ -5,81 +5,28 @@
   "about": {
     "slug": "_valentin",
     "nombre": "Valentin Barrio",
-    "imgExt": "webp",
     "imgCountArchive": 11,
-    "fotosHome": [
-      1
-    ],
-    "fichaTecnica": [
-      "Photography",
-      "Art Direction",
-      "Visual Storytelling"
-    ],
+    "fotosHome": [1],
+    "type": "Photography, Art Direction, Visual Storytelling",
     "lugar": "Barcelona",
     "descripcion": "Photographer and visual artist based in Barcelona. Focused on capturing the raw energy of live events, fashion editorials, and intimate portraits.",
     "fecha": "",
-    "team": [],
     "contenido": [
-      {
-        "tipo": "imagen",
-        "src": 1
-      },
-      {
-        "tipo": "imagen",
-        "src": 2
-      },
-      {
-        "tipo": "texto",
-        "contenido": "Every frame is a conversation between what happened and what I chose to see."
-      },
-      {
-        "tipo": "imagen",
-        "src": 3
-      },
-      {
-        "tipo": "imagen",
-        "src": 4
-      },
-      {
-        "tipo": "audio",
-        "src": "WhatsApp Audio 2026-04-09 at 11.23.28.opus"
-      },
-      {
-        "tipo": "imagen",
-        "src": 5
-      },
-      {
-        "tipo": "imagen",
-        "src": 6
-      },
-      {
-        "tipo": "texto",
-        "contenido": "I don't chase the light. I wait for it to find its way."
-      },
-      {
-        "tipo": "imagen",
-        "src": 7
-      },
-      {
-        "tipo": "imagen",
-        "src": 8
-      },
-      {
-        "tipo": "imagen",
-        "src": 9
-      },
-      {
-        "tipo": "texto",
-        "contenido": "The silence between two frames is where the real story lives."
-      },
-      {
-        "tipo": "imagen",
-        "src": 10
-      },
-      {
-        "tipo": "imagen",
-        "src": 11
-      }
+      { "tipo": "imagen", "src": 1 },
+      { "tipo": "imagen", "src": 2 },
+      { "tipo": "texto", "contenido": "Every frame is a conversation between what happened and what I chose to see." },
+      { "tipo": "imagen", "src": 3 },
+      { "tipo": "imagen", "src": 4 },
+      { "tipo": "audio", "src": "WhatsApp Audio 2026-04-09 at 11.23.28.opus" },
+      { "tipo": "imagen", "src": 5 },
+      { "tipo": "imagen", "src": 6 },
+      { "tipo": "texto", "contenido": "I don't chase the light. I wait for it to find its way." },
+      { "tipo": "imagen", "src": 7 },
+      { "tipo": "imagen", "src": 8 },
+      { "tipo": "imagen", "src": 9 },
+      { "tipo": "texto", "contenido": "The silence between two frames is where the real story lives." },
+      { "tipo": "imagen", "src": 10 },
+      { "tipo": "imagen", "src": 11 }
     ]
   },
   "projects": [
@@ -87,232 +34,124 @@
       "slug": "bolder",
       "nombre": "Bolder",
       "imgCountArchive": 7,
-      "fotosHome": [
-        1,
-        3,
-        5
-      ],
-      "fichaTecnica": [
-        "press"
-      ],
+      "fotosHome": [1, 3, 5],
+      "type": "press",
       "lugar": "Barcelona",
       "descripcion": "Editorial shoot exploring contrast between urban attitude and raw natural landscapes.",
-      "fecha": "jan. 26",
-      "team": [],
-      "contenido": null
+      "fecha": "jan. 26"
     },
     {
       "slug": "brunch",
       "nombre": "Brunch!",
       "imgCountArchive": 81,
-      "fotosHome": [
-        1,
-        12,
-        25
-      ],
-      "fichaTecnica": [
-        "festival"
-      ],
+      "fotosHome": [1, 12, 25],
+      "type": "festival",
       "lugar": "Barcelona",
       "descripcion": "Full documentation of the Brunch electronic music series. Light, smoke, and movement.",
-      "fecha": "august 25",
-      "team": [],
-      "contenido": null
+      "fecha": "august 25"
     },
     {
       "slug": "kalaRos",
       "nombre": "Kala Ros",
       "imgCountArchive": 7,
-      "fotosHome": [
-        1,
-        3,
-        5
-      ],
-      "fichaTecnica": [
-        "press"
-      ],
+      "fotosHome": [1, 3, 5],
+      "type": "press",
       "lugar": "Barcelona",
       "descripcion": "Intimate portrait series. Natural light, minimal intervention.",
-      "fecha": "dec 25",
-      "team": [],
-      "contenido": null
+      "fecha": "dec 25"
     },
     {
       "slug": "kult",
       "nombre": "Kult",
       "imgCountArchive": 9,
-      "fotosHome": [
-        1,
-        4,
-        7
-      ],
-      "fichaTecnica": [
-        "club"
-      ],
+      "fotosHome": [1, 4, 7],
+      "type": "club",
       "lugar": "Barcelona",
       "descripcion": "Dark editorial for Kult magazine. Textures, shadows, and bold silhouettes.",
-      "fecha": "dec. 25",
-      "team": [],
-      "contenido": null
+      "fecha": "dec. 25"
     },
     {
       "slug": "lucho",
       "nombre": "Lucho (Ve)",
       "imgCountArchive": 12,
-      "fotosHome": [
-        1,
-        5,
-        9
-      ],
-      "fichaTecnica": [
-        "press"
-      ],
+      "fotosHome": [1, 5, 9],
+      "type": "press",
       "lugar": "Reflejo 44",
       "descripcion": "Artist portrait series. Capturing the personality behind the sound.",
-      "fecha": "feb. 26",
-      "team": [],
-      "contenido": null
+      "fecha": "feb. 26"
     },
     {
       "slug": "lynn",
       "nombre": "Lynn",
       "imgCountArchive": 10,
-      "fotosHome": [
-        1,
-        4,
-        7
-      ],
-      "fichaTecnica": [
-        "press"
-      ],
+      "fotosHome": [1, 4, 7],
+      "type": "press",
       "lugar": "Mallorca",
       "descripcion": "Golden hour portrait session. Warmth and authenticity.",
       "fecha": "oct. 25",
-      "team": [
-        [
-          "Rivka (photo assist & 2nd camera)",
-          ""
-        ]
-      ],
-      "contenido": null
+      "team": [["Rivka (photo assist & 2nd camera)", ""]]
     },
     {
       "slug": "razz",
       "nombre": "Razz",
       "imgCountArchive": 19,
-      "fotosHome": [
-        1,
-        7,
-        13
-      ],
-      "fichaTecnica": [
-        "club"
-      ],
+      "fotosHome": [1, 7, 13],
+      "type": "club",
       "lugar": "Barcelona",
       "descripcion": "Razzmatazz nights. The energy of the crowd under neon and strobe.",
-      "fecha": "feb. 25",
-      "team": [],
-      "contenido": null
+      "fecha": "feb. 25"
     },
     {
       "slug": "santana",
       "nombre": "Santana",
       "imgCountArchive": 10,
-      "fotosHome": [
-        1,
-        4,
-        7
-      ],
-      "fichaTecnica": [
-        "club"
-      ],
+      "fotosHome": [1, 4, 7],
+      "type": "club",
       "lugar": "Barcelona",
       "descripcion": "Character study in urban environments. Street meets studio.",
-      "fecha": "feb. 26",
-      "team": [],
-      "contenido": null
+      "fecha": "feb. 26"
     },
     {
       "slug": "soundit",
       "nombre": "Sound it!",
       "imgCountArchive": 71,
-      "fotosHome": [
-        1,
-        20,
-        40
-      ],
-      "fichaTecnica": [
-        "festival"
-      ],
+      "fotosHome": [1, 20, 40],
+      "type": "festival",
       "lugar": "Barcelona",
       "descripcion": "Complete visual chronicle of Soundit festival. From backstage to main stage.",
-      "fecha": "august 25",
-      "team": [],
-      "contenido": null
+      "fecha": "august 25"
     },
     {
       "slug": "yu",
       "nombre": "Yu",
       "imgCountArchive": 17,
-      "fotosHome": [
-        1,
-        6,
-        12
-      ],
-      "fichaTecnica": [
-        "club"
-      ],
+      "fotosHome": [1, 6, 12],
+      "type": "club",
       "lugar": "Barcelona",
       "descripcion": "Fashion editorial blending Eastern and Western aesthetics.",
-      "fecha": "dec. 25",
-      "team": [],
-      "contenido": null
+      "fecha": "dec. 25"
     },
     {
       "slug": "carlos",
       "nombre": "Carlos",
       "imgCountArchive": 21,
-      "fotosHome": [
-        1,
-        8,
-        15
-      ],
-      "fichaTecnica": [
-        "press"
-      ],
+      "fotosHome": [1, 8, 15],
+      "type": "press",
       "lugar": "Barcelona",
       "descripcion": "Portrait editorial with Carlos. Character, attitude, and natural expression.",
       "fecha": "Spring 2025",
-      "team": [
-        [
-          "Carlos",
-          ""
-        ]
-      ],
-      "contenido": null
+      "team": [["Carlos", ""]]
     },
     {
       "slug": "heyami",
       "nombre": "Hey Ami",
       "imgCountArchive": 9,
-      "fotosHome": [
-        1,
-        4,
-        7
-      ],
-      "fichaTecnica": [
-        "press"
-      ],
+      "fotosHome": [1, 4, 7],
+      "type": "press",
       "lugar": "Barcelona",
       "descripcion": "Creative direction and photography for Hey Ami. Bold visuals and identity.",
       "fecha": "Winter 2025",
-      "team": [
-        [
-          "Hey Ami",
-          ""
-        ]
-      ],
-      "contenido": null
+      "team": [["Hey Ami", ""]]
     }
   ],
   "personalProjects": [
@@ -320,208 +159,73 @@
       "slug": "insomnia",
       "nombre": "Insomnia",
       "imgCountArchive": 10,
-      "fotosHome": [
-        1,
-        4,
-        8
-      ],
-      "fichaTecnica": [
-        "Personal",
-        "Night Photography"
-      ],
+      "fotosHome": [1, 4, 8],
+      "type": "personal, night photography",
       "lugar": "Barcelona",
       "descripcion": "Sleepless nights in the city. What happens when nobody is watching.",
       "fecha": "Winter 2024",
-      "team": [],
       "contenido": [
-        {
-          "tipo": "imagen",
-          "src": 1
-        },
-        {
-          "tipo": "imagen",
-          "src": 2
-        },
-        {
-          "tipo": "texto",
-          "contenido": "3 AM. The streets empty out but the light stays on."
-        },
-        {
-          "tipo": "imagen",
-          "src": 3
-        },
-        {
-          "tipo": "imagen",
-          "src": 4
-        },
-        {
-          "tipo": "imagen",
-          "src": 5
-        },
-        {
-          "tipo": "texto",
-          "contenido": "There is something honest about a city at night. It stops performing."
-        },
-        {
-          "tipo": "imagen",
-          "src": 6
-        },
-        {
-          "tipo": "imagen",
-          "src": 7
-        },
-        {
-          "tipo": "imagen",
-          "src": 8
-        },
-        {
-          "tipo": "imagen",
-          "src": 9
-        },
-        {
-          "tipo": "imagen",
-          "src": 10
-        }
+        { "tipo": "imagen", "src": 1 },
+        { "tipo": "imagen", "src": 2 },
+        { "tipo": "texto", "contenido": "3 AM. The streets empty out but the light stays on." },
+        { "tipo": "imagen", "src": 3 },
+        { "tipo": "imagen", "src": 4 },
+        { "tipo": "imagen", "src": 5 },
+        { "tipo": "texto", "contenido": "There is something honest about a city at night. It stops performing." },
+        { "tipo": "imagen", "src": 6 },
+        { "tipo": "imagen", "src": 7 },
+        { "tipo": "imagen", "src": 8 },
+        { "tipo": "imagen", "src": 9 },
+        { "tipo": "imagen", "src": 10 }
       ]
     },
     {
       "slug": "fragments",
       "nombre": "Fragments",
       "imgCountArchive": 11,
-      "fotosHome": [
-        2,
-        6,
-        10
-      ],
-      "fichaTecnica": [
-        "Personal",
-        "Mixed Media"
-      ],
+      "fotosHome": [2, 6, 10],
+      "type": "personal, mixed media",
       "lugar": "",
       "descripcion": "Collected moments from different times and places. A visual diary.",
       "fecha": "2023-2024",
-      "team": [],
       "contenido": [
-        {
-          "tipo": "texto",
-          "contenido": "What happens when you stop organizing memories by project and let them breathe on their own?"
-        },
-        {
-          "tipo": "imagen",
-          "src": 1
-        },
-        {
-          "tipo": "imagen",
-          "src": 2
-        },
-        {
-          "tipo": "imagen",
-          "src": 3
-        },
-        {
-          "tipo": "imagen",
-          "src": 4
-        },
-        {
-          "tipo": "texto",
-          "contenido": "Some of these were accidents. Most of the best ones were."
-        },
-        {
-          "tipo": "imagen",
-          "src": 5
-        },
-        {
-          "tipo": "imagen",
-          "src": 6
-        },
-        {
-          "tipo": "imagen",
-          "src": 7
-        },
-        {
-          "tipo": "imagen",
-          "src": 8
-        },
-        {
-          "tipo": "imagen",
-          "src": 9
-        },
-        {
-          "tipo": "imagen",
-          "src": 10
-        },
-        {
-          "tipo": "imagen",
-          "src": 11
-        }
+        { "tipo": "texto", "contenido": "What happens when you stop organizing memories by project and let them breathe on their own?" },
+        { "tipo": "imagen", "src": 1 },
+        { "tipo": "imagen", "src": 2 },
+        { "tipo": "imagen", "src": 3 },
+        { "tipo": "imagen", "src": 4 },
+        { "tipo": "texto", "contenido": "Some of these were accidents. Most of the best ones were." },
+        { "tipo": "imagen", "src": 5 },
+        { "tipo": "imagen", "src": 6 },
+        { "tipo": "imagen", "src": 7 },
+        { "tipo": "imagen", "src": 8 },
+        { "tipo": "imagen", "src": 9 },
+        { "tipo": "imagen", "src": 10 },
+        { "tipo": "imagen", "src": 11 }
       ]
     },
     {
       "slug": "quiet",
       "nombre": "Quiet",
       "imgCountArchive": 10,
-      "fotosHome": [
-        1,
-        5,
-        9
-      ],
-      "fichaTecnica": [
-        "Personal",
-        "Landscape"
-      ],
+      "fotosHome": [1, 5, 9],
+      "type": "personal, landscape",
       "lugar": "Catalonia",
       "descripcion": "The silence between two thoughts. Landscapes and stillness.",
       "fecha": "Spring 2024",
-      "team": [],
       "contenido": [
-        {
-          "tipo": "imagen",
-          "src": 1
-        },
-        {
-          "tipo": "imagen",
-          "src": 2
-        },
-        {
-          "tipo": "imagen",
-          "src": 3
-        },
-        {
-          "tipo": "texto",
-          "contenido": "I started this project to remember how to be still."
-        },
-        {
-          "tipo": "imagen",
-          "src": 4
-        },
-        {
-          "tipo": "imagen",
-          "src": 5
-        },
-        {
-          "tipo": "imagen",
-          "src": 6
-        },
-        {
-          "tipo": "imagen",
-          "src": 7
-        },
-        {
-          "tipo": "texto",
-          "contenido": "The mountain does not care about your deadline."
-        },
-        {
-          "tipo": "imagen",
-          "src": 8
-        },
-        {
-          "tipo": "imagen",
-          "src": 9
-        },
-        {
-          "tipo": "imagen",
-          "src": 10
-        }
+        { "tipo": "imagen", "src": 1 },
+        { "tipo": "imagen", "src": 2 },
+        { "tipo": "imagen", "src": 3 },
+        { "tipo": "texto", "contenido": "I started this project to remember how to be still." },
+        { "tipo": "imagen", "src": 4 },
+        { "tipo": "imagen", "src": 5 },
+        { "tipo": "imagen", "src": 6 },
+        { "tipo": "imagen", "src": 7 },
+        { "tipo": "texto", "contenido": "The mountain does not care about your deadline." },
+        { "tipo": "imagen", "src": 8 },
+        { "tipo": "imagen", "src": 9 },
+        { "tipo": "imagen", "src": 10 }
       ]
     }
   ]

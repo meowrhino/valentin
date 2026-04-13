@@ -340,7 +340,7 @@ const App = {
       filtered = this.state.allProjects;
     } else {
       filtered = this.state.allProjects.filter(p =>
-        p.fichaTecnica && p.fichaTecnica.some(t => t.toLowerCase() === type)
+        p.type && p.type.toLowerCase() === type
       );
     }
 
@@ -384,13 +384,13 @@ const App = {
     // Discover type order from first appearance
     const typeOrder = [];
     projects.forEach(p => {
-      const type = (p.fichaTecnica && p.fichaTecnica[0]) ? p.fichaTecnica[0].toLowerCase() : 'other';
+      const type = p.type ? p.type.toLowerCase() : 'other';
       if (!typeOrder.includes(type)) typeOrder.push(type);
     });
     // Stable sort: group by type, keep original order within each type
     return [...projects].sort((a, b) => {
-      const typeA = (a.fichaTecnica && a.fichaTecnica[0]) ? a.fichaTecnica[0].toLowerCase() : 'other';
-      const typeB = (b.fichaTecnica && b.fichaTecnica[0]) ? b.fichaTecnica[0].toLowerCase() : 'other';
+      const typeA = a.type ? a.type.toLowerCase() : 'other';
+      const typeB = b.type ? b.type.toLowerCase() : 'other';
       return typeOrder.indexOf(typeA) - typeOrder.indexOf(typeB);
     });
   },
